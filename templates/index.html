@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HOME PAGE</title>
+</head>
+<body>
+<form action="{{ url_for('upload_file') }}" enctype="multipart/form-data" method="POST">
+    <input name="img" type="file"/>
+    <input type="submit"/>
+</form>
+ 
+{% if img %}
+<h4 style="margin-left: 40px;">Foto Inputan</h4>
+<div style="width: 40px;">
+    <img src="{{ img }}" style="width: 300px;">
+</div>
+{% endif %}
+
+{% if histogram %}
+<h4 style="margin-left: 40px;">Histogram Gambar</h4>
+<div style="width: 40px;">
+    <img src="{{ histogram }}" style="width: 300px;">
+</div>
+{% endif %}
+
+{% if histogram2 %}
+<h4 style="margin-left: 40px;">2 Gambar</h4>
+<div style="width: 40px;">
+    <img src="{{ histogram2 }}" style="width: 300px;">
+</div>
+{% endif %}
+
+{% if img2 %}
+<h4 style="margin-left: 40px;">Foto Equal</h4>
+<div style="width: 40px;">
+    <img src="{{ img2 }}" style="width: 300px;">
+</div>
+{% endif %}
+
+<!-- {% if histogram2 %}
+<h4 style="margin-left: 40px;">Histogram Gambar</h4>
+<div style="width: 40px;">
+    <img src="{{ histogram2 }}" style="width: 300px;">
+</div>
+{% endif %} -->
+
+
+</body>
+</html>
