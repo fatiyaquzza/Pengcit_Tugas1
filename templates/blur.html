@@ -6,6 +6,56 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Ni blur</h1>
+    <form action="{{ url_for('blurWajah') }}" 
+        enctype="multipart/form-data"
+        method="POST"
+        class=""
+      > 
+        <div class="mx-10">
+          <label
+            for="formFile"
+            class="mb-2 inline-block text-neutral-700 text-xl"
+            >Input Image</label
+          >
+
+          <div class="flex">
+            <input
+              name="img"
+              id="img"
+              type="file"
+              class="block w-2/3 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 file:py-4 file:text-base file:bg-gray-200 file:border-gray-200 hover:file:bg-gray-300"
+            />
+
+            <input
+              type="submit"
+              class="inline-flex items-center justify-center px-10 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-indigo-700 border border-indigo-700 rounded-md shadow-[0_4px_9px_-4px_#3b71ca] hover:bg-indigo-800 ml-4 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)]"
+            />
+          </div>
+        </div>
+      </form>
+
+
+      <section class="mt-20">
+        <div class="flex justify-center">
+          <div class="mr-10">
+            {% if img %}
+            <h4 class="text-center font-medium text-2xl text-gray-600 mb-6">
+              Gambar Awal
+            </h4>
+            <img src="{{ img }}" class="w-[500px]" />
+            {% endif %}
+          </div>
+  
+          <div>
+            {% if result_filename %}
+            <h4 class="text-center font-medium text-2xl text-gray-600 mb-6">
+              Histogram Awal
+            </h4>
+            <img src="{{ result_filename }}" class="w-[500px]" />
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
 </body>
 </html>
