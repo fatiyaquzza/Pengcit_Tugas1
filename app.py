@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 import os
 import matplotlib.pyplot as plt
@@ -77,6 +77,11 @@ def upload_file():
         return render_template('index.html', img=img_path, img2=equalized_image_path, histogram=hist_image_path, histogram2=hist_equalized_image_path)
     
     return render_template('index.html')
+
+@app.route('/blur')
+def blur():
+    # show the form, it wasn't submitted
+    return render_template('blur.html')
 
 
 if __name__ == '__main__': 
