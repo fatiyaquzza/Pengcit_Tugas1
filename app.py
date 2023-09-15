@@ -1,3 +1,4 @@
+
 from flask import Flask, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 import os
@@ -10,7 +11,12 @@ upload_folder = os.path.join('static', 'uploads')
 
 app.config['UPLOAD'] = upload_folder
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+
+@app.route('/histogram', methods=['GET', 'POST'])
 def histogram_equ():
     if request.method == 'POST':
         file = request.files['img']
@@ -74,9 +80,9 @@ def histogram_equ():
         plt.legend()
         plt.savefig(hist_equalized_image_path)
 
-        return render_template('index.html', img=img_path, img2=equalized_image_path, histogram=hist_image_path, histogram2=hist_equalized_image_path)
+        return render_template('histogram_equalization.html', img=img_path, img2=equalized_image_path, histogram=hist_image_path, histogram2=hist_equalized_image_path)
     
-    return render_template('index.html')
+    return render_template('histogram_equalization.html')
 
 def edge_detection(img):
     # Menerapkan deteksi tepi menggunakan algoritma Canny
@@ -105,7 +111,7 @@ def edge_detection(img):
     return edge_image_path, hist_edge_image_path
 
 @app.route('/edge', methods=['GET', 'POST'])
-def blurWajah():
+def edge():
     if request.method == 'POST':
         file = request.files['img']
         filename = secure_filename(file.filename)
@@ -118,9 +124,9 @@ def blurWajah():
         # Memanggil fungsi edge_detection
         edge_image_path, hist_edge_image_path = edge_detection(img)
 
-        return render_template('blur.html', img=img_path, edge=edge_image_path, histogram_edge=hist_edge_image_path)
+        return render_template('edge.html', img=img_path, edge=edge_image_path, histogram_edge=hist_edge_image_path)
     
-    return render_template('blur.html')
+    return render_template('edge.html')
 
 
 if __name__ == '__main__': 
