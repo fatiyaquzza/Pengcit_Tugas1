@@ -11,7 +11,7 @@ upload_folder = os.path.join('static', 'uploads')
 app.config['UPLOAD'] = upload_folder
 
 @app.route('/', methods=['GET', 'POST'])
-def upload_file():
+def histogram_equ():
     if request.method == 'POST':
         file = request.files['img']
         filename = secure_filename(file.filename)
@@ -78,33 +78,48 @@ def upload_file():
     
     return render_template('index.html')
 
+def edge_detection(img):
+    # Menerapkan deteksi tepi menggunakan algoritma Canny
+    edges = cv2.Canny(img, 100, 200)  # Anda dapat mengatur threshold sesuai kebutuhan
+    
+    # Menyimpan gambar hasil deteksi tepi ke folder "static/uploads"
+    edge_image_path = os.path.join(app.config['UPLOAD'], 'edge_detected.jpg')
+    cv2.imwrite(edge_image_path, edges)
 
-@app.route('/blur', methods=['GET', 'POST'])
+    # Menghitung histogram untuk gambar hasil deteksi tepi
+    hist_edge = cv2.calcHist([edges], [0], None, [256], [0, 256])
+
+    # Normalisasi histogram
+    hist_edge /= hist_edge.sum()
+
+    # Simpan histogram hasil deteksi tepi sebagai gambar PNG
+    hist_edge_image_path = os.path.join(app.config['UPLOAD'], 'histogram_edge.png')
+    plt.figure()
+    plt.title("Edge Detection Histogram")
+    plt.xlabel("Value")
+    plt.ylabel("Frequency")
+    plt.plot(hist_edge, color='gray', label='Edge')
+    plt.legend()
+    plt.savefig(hist_edge_image_path)
+
+    return edge_image_path, hist_edge_image_path
+
+@app.route('/edge', methods=['GET', 'POST'])
 def blurWajah():
     if request.method == 'POST':
-            file = request.files['img']
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD'], filename))
-            img_path = os.path.join(app.config['UPLOAD'], filename)
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
 
-            # Membaca gambar dengan OpenCV
-            img = cv2.imread(img_path)
+        # Membaca gambar dengan OpenCV
+        img = cv2.imread(img_path)
 
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30))
+        # Memanggil fungsi edge_detection
+        edge_image_path, hist_edge_image_path = edge_detection(img)
 
-            for (x, y, w, h) in faces:
-                face_roi = img[y:y + h, x:x + w]
-                face_roi = cv2.GaussianBlur(face_roi, (23, 23), 30)
-                img[y:y + face_roi.shape[0], x:x + face_roi.shape[1]] = face_roi
-
-            # Simpan foto hasilnya
-            output_filename = 'hasil_blur.jpg'
-            cv2.imwrite(output_filename, img)
-            
-            return render_template('blur.html', img=img_path, result_filename=output_filename)
-    # show the form, it wasn't submitted
+        return render_template('blur.html', img=img_path, edge=edge_image_path, histogram_edge=hist_edge_image_path)
+    
     return render_template('blur.html')
 
 
