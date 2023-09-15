@@ -11,7 +11,7 @@ upload_folder = os.path.join('static', 'uploads')
 app.config['UPLOAD'] = upload_folder
 
 @app.route('/', methods=['GET', 'POST'])
-def upload_file():
+def histogram_equ():
     if request.method == 'POST':
         file = request.files['img']
         filename = secure_filename(file.filename)
@@ -78,9 +78,48 @@ def upload_file():
     
     return render_template('index.html')
 
-@app.route('/blur')
-def blur():
-    # show the form, it wasn't submitted
+def edge_detection(img):
+    # Menerapkan deteksi tepi menggunakan algoritma Canny
+    edges = cv2.Canny(img, 100, 200)  # Anda dapat mengatur threshold sesuai kebutuhan
+    
+    # Menyimpan gambar hasil deteksi tepi ke folder "static/uploads"
+    edge_image_path = os.path.join(app.config['UPLOAD'], 'edge_detected.jpg')
+    cv2.imwrite(edge_image_path, edges)
+
+    # Menghitung histogram untuk gambar hasil deteksi tepi
+    hist_edge = cv2.calcHist([edges], [0], None, [256], [0, 256])
+
+    # Normalisasi histogram
+    hist_edge /= hist_edge.sum()
+
+    # Simpan histogram hasil deteksi tepi sebagai gambar PNG
+    hist_edge_image_path = os.path.join(app.config['UPLOAD'], 'histogram_edge.png')
+    plt.figure()
+    plt.title("Edge Detection Histogram")
+    plt.xlabel("Value")
+    plt.ylabel("Frequency")
+    plt.plot(hist_edge, color='gray', label='Edge')
+    plt.legend()
+    plt.savefig(hist_edge_image_path)
+
+    return edge_image_path, hist_edge_image_path
+
+@app.route('/edge', methods=['GET', 'POST'])
+def blurWajah():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        # Membaca gambar dengan OpenCV
+        img = cv2.imread(img_path)
+
+        # Memanggil fungsi edge_detection
+        edge_image_path, hist_edge_image_path = edge_detection(img)
+
+        return render_template('blur.html', img=img_path, edge=edge_image_path, histogram_edge=hist_edge_image_path)
+    
     return render_template('blur.html')
 
 
