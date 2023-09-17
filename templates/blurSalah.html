@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Face Blur</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    
+</head>
+<body class="text-lg">
+    <nav class="flex w-full flex-wrap items-center justify-between bg-white py-3 shadow-lg mb-10 sticky top-0">
+        <div class="flex w-full flex-wrap items-center justify-between px-3 lg:px-6">
+            <div class="flex items-center my-auto">
+                <img src="/static/img/logo.png" alt="logo" class="w-28">
+                <h3 class="text-neutral-900 hover:text-gray-900 focus:text-neutral-900 dark:bg-neutral-600 font-bold text-3xl">
+                    Pengcit
+                </h3>
+            </div>
+            <h4 class="text-neutral-900 hover:text-gray-900 focus:text-neutral-900 dark:bg-neutral-600 font-bold text-xl">
+                Kelompok 3
+            </h4>
+        </div>
+    </nav>
+
+
+    {% if error %}  
+    <p><strong>Error</strong>: {{error}}</p>  
+    {% endif %}
+
+    <section>
+        <form action="{{ url_for('upload_file') }}" enctype="multipart/form-data" method="POST" class="">
+            <div class="mx-10">
+                <label for="formFile" class="mb-2 inline-block text-neutral-700 text-xl">Input Image</label>
+
+                <div class="flex">
+                    <input name="img" id="img" accept=".jpg, .jpeg, .png" type="file" class="block w-2/3 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 file:py-4 file:text-base file:bg-gray-200 file:border-gray-200 hover:file:bg-gray-300">
+                    <input type="submit" class="inline-flex items-center justify-center px-10 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-indigo-700 border border-indigo-700 rounded-md shadow-[0_4px_9px_-4px_#3b71ca] hover:bg-indigo-800 ml-4 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)]">
+                </div>
+
+                <label for="blur-slider" class="mb-2 inline-block text-neutral-700 text-xl mt-4">Blur Level</label>
+                <input type="range" name="blur_level" min="1" max="100" value="51" id="blur-slider" step="2" oninput="updateBlur(this.value)">
+            </div>
+        </form>
+    </section>
+
+    <section class="mt-20">
+        <div class="flex justify-center">
+            <div class="mr-10">
+                {% if img %}
+                <h4 class="text-center font-medium text-2xl text-gray-600 mb-6">Original Image</h4>
+                <img src="{{ img }}" alt="Original Image" class="w-[500px]" id="original-img">
+
+                {% endif %}
+            </div>
+
+            <div class="flex justify-center mt-20">
+                <div class="mr-10">
+                    {% if img2 %}
+                    <h4 class="text-center font-medium text-2xl text-gray-600 mb-6">Blurred Image</h4>
+                    <img src="{{ img2 }}" alt="Blurred Image" class="w-[500px]" id="blurred-img">
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+    
+    <script>
+        // Function to send the blur level to Flask in real-time
+        function updateBlur(blurLevel) {
+          // Send an AJAX POST request to Flask to update the blur level
+          $.ajax({
+            type: "POST",
+            url: "/",
+            data: { blur_level: blurLevel },
+            success: function (response) {
+              // Handle the response from Flask if needed
+              console.log("Blur level updated successfully: " + response);
+            },
+          });
+        }
+      </script>
+      
+    
+    
+</body>
+</html>

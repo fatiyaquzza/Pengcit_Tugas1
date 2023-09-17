@@ -1,3 +1,4 @@
+
 from flask import Flask, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 import os
@@ -10,7 +11,12 @@ upload_folder = os.path.join('static', 'uploads')
 
 app.config['UPLOAD'] = upload_folder
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+
+@app.route('/histogram', methods=['GET', 'POST'])
 def histogram_equ():
     if request.method == 'POST':
         file = request.files['img']
@@ -74,9 +80,9 @@ def histogram_equ():
         plt.legend()
         plt.savefig(hist_equalized_image_path)
 
-        return render_template('index.html', img=img_path, img2=equalized_image_path, histogram=hist_image_path, histogram2=hist_equalized_image_path)
+        return render_template('histogram_equalization.html', img=img_path, img2=equalized_image_path, histogram=hist_image_path, histogram2=hist_equalized_image_path)
     
-    return render_template('index.html')
+    return render_template('histogram_equalization.html')
 
 def edge_detection(img):
     # Menerapkan deteksi tepi menggunakan algoritma Canny
@@ -105,7 +111,7 @@ def edge_detection(img):
     return edge_image_path, hist_edge_image_path
 
 @app.route('/edge', methods=['GET', 'POST'])
-def blurWajah():
+def edge():
     if request.method == 'POST':
         file = request.files['img']
         filename = secure_filename(file.filename)
@@ -118,9 +124,76 @@ def blurWajah():
         # Memanggil fungsi edge_detection
         edge_image_path, hist_edge_image_path = edge_detection(img)
 
-        return render_template('blur.html', img=img_path, edge=edge_image_path, histogram_edge=hist_edge_image_path)
+        return render_template('edge.html', img=img_path, edge=edge_image_path, histogram_edge=hist_edge_image_path)
     
+    return render_template('edge.html')
+
+
+def blur_faces(image_path, blur_level):
+    # Membaca gambar dengan OpenCV
+    img = cv2.imread(image_path)
+
+    # Menggunakan Cascade Classifier untuk mendeteksi wajah
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    # Menerapkan deteksi wajah dengan parameter yang diatur
+    faces = face_cascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=4, minSize=[30, 30])
+
+    # Menerapkan efek blur ke setiap wajah yang terdeteksi
+    for (x, y, w, h) in faces:
+        # Ambil bagian wajah dari gambar
+        face = img[y:y+h, x:x+w]
+        # Hitung ukuran kernel berdasarkan tingkat blur yang diatur
+        kernel_size = (blur_level, blur_level)
+        # Terapkan efek blur Gaussian dengan kernel yang sesuai
+        blurred_face = cv2.GaussianBlur(face, kernel_size, 0)
+        img[y:y+h, x:x+w] = blurred_face
+
+    # Menyimpan gambar dengan wajah-wajah yang telah di-blur
+    blurred_image_path = os.path.join(app.config['UPLOAD'], 'blurred_image.jpg')
+    cv2.imwrite(blurred_image_path, img)
+
+    return blurred_image_path
+
+
+
+@app.route('/faceBlur', methods=['GET', 'POST'])
+def face_blur():
+    error = None
+    if request.method == 'POST':
+        # Check if the 'img' file is in the request
+        if 'img' not in request.files:
+            error = 'Please Select a Picture'
+            return render_template('blur.html', error=error)
+
+        file = request.files['img']
+
+        # Check if the file name is empty
+        if file.filename == '':
+           error = 'Please Select a Picture'
+           return render_template('blur.html', error=error)
+
+        # Check if the file is allowed (e.g., only image files)
+        allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
+        if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+            error = 'File is not allowed'
+            return render_template('blur.html', error=error)
+
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        image_path = os.path.join(app.config['UPLOAD'], filename)
+
+        # Get blur level from the form
+        blur_level = int(request.form.get('tingkatan', 0))
+
+        # Call the function to blur faces
+        blurred_image_path = blur_faces(image_path, blur_level)
+
+        return render_template('blur.html', img=image_path, img2=blurred_image_path)
+
     return render_template('blur.html')
+
 
 
 if __name__ == '__main__': 
