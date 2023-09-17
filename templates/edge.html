@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="font-Poppins ">
 
   <nav
       class=" flex w-full flex-wrap items-center justify-between bg-stone-800 text-white py-3 shadow-lg mb-10 sticky top-0"
@@ -31,8 +31,11 @@
       <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
     </li>
     <li>
-      <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Faces Blur In Image</a>
+      <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
     </li>
+    <li>
+      <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
+  </li>
   </ul>
 </div>
 
