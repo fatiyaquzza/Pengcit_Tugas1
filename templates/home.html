@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="font-Poppins bg-stone-500 ">
+
+    <nav
+      class=" flex w-full flex-wrap items-center justify-between bg-stone-800 text-white py-3 shadow-lg mb-10 sticky top-0"
+    >
+      <div
+        class="flex w-full flex-wrap items-center justify-between px-6 py-6 lg:px-6"
+      >
+      
+<button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="hover:text-stone-700 hover:bg-white bg-stone-700 text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Menu<svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+</svg></button>
+<!-- Dropdown menu -->
+<div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+  <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+    <li>
+      <a href="{{ url_for('home') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
+    </li>
+    <li>
+      <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
+    </li>
+    <li>
+      <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
+    </li>
+    <li>
+      <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
+  </li>
+  </ul>
+</div>
+
+      <h3 class=" font-bold text-3xl"> Pengolahan Citra </h3>
+ 
+        <h4
+          class=" font-bold text-xl"
+        >
+          Kelompok 3
+        </h4>
+      </div>
+    </nav>
+
+    <section class="flex flex-wrap justify-center -mb-8">
+        <div class="flex justify-center w-full lg:w-1/2 mb-8">
+        <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('histogram_equ') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Histogram Equalization</h2>
+                </div>
+
+                <div class="border-t">
+                        <div class="w-full p-6 ">
+                            <p class="text-sm leading-loose text-justify">
+                                Histogram equalization is a image processing technique used to enhance the contrast and dynamic range of an image by redistributing the pixel intensities in a way that maximizes the utilization of the available intensity levels. It works by transforming the histogram of an image so that the resulting histogram is approximately uniform, spreading out the pixel values over the entire intensity range. This improves the visibility of details in both dark and bright regions of the image, making it particularly useful for enhancing images with uneven lighting or low contrast.
+                            </p>
+                        </div>
+                
+                </div>
+        </div>
+        </div>
+
+        <div class="flex justify-center w-full lg:w-1/2 mb-8">
+            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('edge') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+    
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Edge Detection</h2>
+                </div>
+    
+                <div class="border-t">
+                        <div class="w-full p-6 ">
+                            <p class="text-sm leading-loose">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
+                            </p>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center w-full lg:w-1/2 mb-8">
+          <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+              <div class="px-6 pt-6">
+                  <a href="{{ url_for('face_blur') }}">
+                      <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                  </a>
+  
+                  <h2 class="mt-4 mb-6 font-semibold 
+                  lg:text-4xl md:text-4xl sm:text-xl text-xl">Blur Face</h2>
+              </div>
+  
+              <div class="border-t">
+                      <div class="w-full p-6 ">
+                          <p class="text-sm leading-loose">
+                              Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
+                          </p>
+                      </div>
+                  
+              </div>
+          </div>
+      </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+</body>
+</html>
