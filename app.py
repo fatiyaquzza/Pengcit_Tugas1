@@ -4,6 +4,10 @@ from werkzeug.utils import secure_filename
 import os
 import matplotlib.pyplot as plt
 import cv2
+import numpy as np
+from PIL import Image
+import tensorflow as tf
+import urllib
 
 app = Flask(__name__)
 
@@ -157,7 +161,6 @@ def blur_faces(image_path, blur_level):
     return blurred_image_path
 
 
-
 @app.route('/faceBlur', methods=['GET', 'POST'])
 def face_blur():
     error = None
@@ -194,7 +197,65 @@ def face_blur():
 
     return render_template('blur.html')
 
+def remove_bg(image_path):
+    img = cv2.imread(image_path)
+    edges = cv2.Canny(img, 80,150)
+    kernel = np.ones((5,5), np.uint8)
+    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=3)
+    erosion = cv2.morphologyEx(closing, cv2.MORPH_ERODE, kernel, iterations=1)
 
+    # When using Grabcut the mask image should be:
+    #    0 - sure background
+    #    1 - sure foreground
+    #    2 - unknown
+
+    mask = np.zeros(img.shape[:2], np.uint8)
+    mask[:] = 2
+    mask[erosion == 255] = 1
+    bgdmodel = np.zeros((1, 65), np.float64)
+    fgdmodel = np.zeros((1, 65), np.float64)
+
+    out_mask = mask.copy()
+    out_mask, _, _ = cv2.grabCut(img,out_mask,None,bgdmodel,fgdmodel,1,cv2.GC_INIT_WITH_MASK)
+    out_mask = np.where((out_mask==2)|(out_mask==0),0,1).astype('uint8')
+    img_removed_bg = img*out_mask[:,:,np.newaxis]
+    removed_bg_image_path = os.path.join(app.config['UPLOAD'], 'img_removed_bg.jpg')
+    cv2.imwrite(removed_bg_image_path, img_removed_bg)
+
+    return removed_bg_image_path
+
+@app.route('/removeBackground', methods=['GET', 'POST'])
+def removebg():
+    error = None
+    if request.method == 'POST':
+        # Check if the 'img' file is in the request
+        if 'img' not in request.files:
+            error = 'Please Select a Picture'
+            return render_template('remove_bg.html', error=error)
+
+        file = request.files['img']
+
+        # Check if the file name is empty
+        if file.filename == '':
+            error = 'Please Select a Picture'
+            return render_template('remove_bg.html', error=error)
+
+        # Check if the file is allowed (e.g., only image files)
+        allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
+        if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+            error = 'File is not allowed'
+            return render_template('remove_bg.html', error=error)
+
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        image_path = os.path.join(app.config['UPLOAD'], filename)
+
+        # Call the function to remove the background
+        remove_background_img = remove_bg(image_path)
+
+        return render_template('remove_bg.html', img=image_path, img2=remove_background_img)
+
+    return render_template('remove_bg.html')
 
 if __name__ == '__main__': 
     app.run(debug=True,port=8001)
