@@ -36,6 +36,13 @@
     <li>
       <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
   </li>
+  <li>
+    <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
+</li>
+
+  <li>
+    <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
+</li>
   </ul>
 </div>
 
@@ -98,7 +105,11 @@
               <img src="{{ edge }}" class="w-[500px]" />
               {% endif %}
             </div>
+<<<<<<< HEAD
           </div>
+=======
+        </div>
+>>>>>>> ayu
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
     </section>
