@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartoon</title>
+</head>
+<body>
+    
+    <form action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="img" id="img" required>
+        <input type="submit" value="Filter keberapa">
+    </form>
+
+    <div class="flex justify-center">
+        <div class="mr-10">
+          {% if img %}
+          <h4 class="text-center font-medium text-2xl text-white mb-6">
+            Gambar Awal
+          </h4>
+          <img src="{{ img }}" class="w-[500px]" />
+          {% endif %}
+        </div>
+
+        <div class="mr-10">
+          {% if img2 %}
+          <h4 class="text-center font-medium text-2xl text-white mb-6">
+            img2
+          </h4>
+          <img src="{{ img2 }}" class="w-[500px]" />
+          {% endif %}
+        </div>
+      </div>
+
+</body>
+</html>

@@ -257,5 +257,7 @@ def removebg():
 
     return render_template('remove_bg.html')
 
+
+
 if __name__ == '__main__': 
     app.run(debug=True,port=8001)
