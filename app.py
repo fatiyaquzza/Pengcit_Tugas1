@@ -7,17 +7,24 @@ import cv2
 import numpy as np
 from PIL import Image
 import tensorflow as tf
-import urllib
+from flask import send_file
+from io import BytesIO
+from flask import request, render_template, send_file
+
 
 app = Flask(__name__)
 
 upload_folder = os.path.join('static', 'uploads')
+app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png'}
 
 app.config['UPLOAD'] = upload_folder
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/')
 def home():
     return render_template('home.html')
+
 
 
 @app.route('/histogram', methods=['GET', 'POST'])
@@ -257,5 +264,55 @@ def removebg():
 
     return render_template('remove_bg.html')
 
-if __name__ == '__main__': 
-    app.run(debug=True,port=8001)
+
+def merge_two_images(image_path1, image_path2, width, height):
+    img1 = cv2.imread(image_path1)
+    img2 = cv2.imread(image_path2)
+
+    # Pastikan gambar memiliki dimensi yang sama
+    img1 = cv2.resize(img1, (width, height))
+    img2 = cv2.resize(img2, (width, height))
+
+    # Lakukan penggabungan gambar setelah mereka memiliki dimensi yang sama
+    merged_image = cv2.addWeighted(img1, 0.5, img2, 0.5, 0)
+
+    return merged_image
+
+
+@app.route('/mergeImages', methods=['GET', 'POST'])
+def merge_images():
+    if request.method == 'POST':
+        # Check if the 'img' file is in the request
+        file1 = request.files['img1']
+        file2 = request.files['img2']
+
+        filename1 = secure_filename(file1.filename)
+        filename2 = secure_filename(file2.filename)
+
+        file2.save(os.path.join(app.config['UPLOAD'], filename2))
+        file1.save(os.path.join(app.config['UPLOAD'], filename1))
+        image_path = os.path.join(app.config['UPLOAD'], filename1)
+        image_path2 = os.path.join(app.config['UPLOAD'], filename2)
+        width = 640  # Ganti dengan lebar yang sesuai
+        height = 480  # Ganti dengan tinggi yang sesuai
+
+        merged_image = merge_two_images(
+            os.path.join(app.config['UPLOAD'], filename1),
+            os.path.join(app.config['UPLOAD'], filename2),
+            width,
+            height
+        )
+
+        merged_image_path = os.path.join(app.config['UPLOAD'], 'merged_image.jpg')
+        cv2.imwrite(merged_image_path, merged_image)
+        return render_template('merge_images.html', merged_image=merged_image_path, img = image_path, img2 = image_path2)
+
+    return render_template('merge_images.html')
+
+if __name__ == '__main__':
+    app.run(debug=True, port=8001)
+
+
+
+
+  
