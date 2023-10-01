@@ -137,25 +137,19 @@ def artistic_filter():
     return render_template('artistic_filter.html')
 
 def apply_lomo_effect(img):
-    # Menerapkan efek lomo dengan peningkatan kontras dan modifikasi warna
-    contrast_factor = 1.2  # Anda dapat mengatur faktor kontras sesuai kebutuhan
-    brightness_factor = 1.2  # Anda dapat mengatur faktor kecerahan sesuai kebutuhan
-
     # Menerapkan modifikasi warna dengan memindahkan komponen warna merah dan biru
     img[:, :, 2] = np.clip(img[:, :, 2] * 1.2, 0, 255)  # Komponen warna merah
+    img[:, :, 1] = np.clip(img[:, :, 1] * 1.2, 0, 255)
     img[:, :, 0] = np.clip(img[:, :, 0] * 0.9, 0, 255)  # Komponen warna biru
-
-    # Menerapkan peningkatan kontras dan kecerahan
-    lomo_img = cv2.convertScaleAbs(img, alpha=contrast_factor, beta=brightness_factor)
 
     # Menyimpan gambar dengan efek lomo ke folder "static/uploads"
     lomo_image_path = os.path.join(app.config['UPLOAD'], 'lomo_image.jpg')
-    cv2.imwrite(lomo_image_path, lomo_img)
+    cv2.imwrite(lomo_image_path, img)
 
     return lomo_image_path
 
 @app.route('/lomoEffect', methods=['GET', 'POST'])
-def glitch_effect():
+def lomo_effect():
     if request.method == 'POST':
         file = request.files['img']
         filename = secure_filename(file.filename)
@@ -168,9 +162,9 @@ def glitch_effect():
         # Memanggil fungsi apply_lomo_effect
         lomo_image_path = apply_lomo_effect(img)
 
-        return render_template('glitch.html', img=img_path, img2=lomo_image_path)
+        return render_template('lomo.html', img=img_path, img2=lomo_image_path)
     
-    return render_template('glitch.html')
+    return render_template('lomo.html')
 
 
 

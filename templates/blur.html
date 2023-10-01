@@ -21,26 +21,33 @@
 </svg></button>
 <!-- Dropdown menu -->
 <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-  <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-    <li>
-      <a href="{{ url_for('home') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
-    </li>
-    <li>
-      <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
-    </li>
-    <li>
-      <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
-    </li>
-    <li>
-      <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
+<ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+<li>
+  <a href="{{ url_for('home') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
+</li>
+<li>
+  <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
+</li>
+<li>
+  <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
+</li>
+<li>
+  <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
+</li>
+</li>
+<li>
+  <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
+</li>
+<li>
+  <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
+</li>
+<li>
+    <a href="{{ url_for('predict') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Cartoonize</a>
   </li>
   <li>
-    <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
+    <a href="{{ url_for('lomo_effect') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lomo Effect</a>
 </li>
-  <li>
-    <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
-</li>
-  </ul>
+</ul>
 </div>
 
       <h3 class=" font-bold text-3xl"> Pengolahan Citra </h3>
