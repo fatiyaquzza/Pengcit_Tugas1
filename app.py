@@ -9,8 +9,7 @@ from PIL import Image
 import tensorflow as tf
 from flask import send_file
 from io import BytesIO
-from flask import request, render_template, send_file
-
+from rembg import remove
 
 app = Flask(__name__)
 
@@ -204,68 +203,36 @@ def face_blur():
 
     return render_template('blur.html')
 
-def remove_bg(image_path):
-    img = cv2.imread(image_path)
-    edges = cv2.Canny(img, 80,150)
-    kernel = np.ones((5,5), np.uint8)
-    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=3)
-    erosion = cv2.morphologyEx(closing, cv2.MORPH_ERODE, kernel, iterations=1)
-
-    # When using Grabcut the mask image should be:
-    #    0 - sure background
-    #    1 - sure foreground
-    #    2 - unknown
-
-    mask = np.zeros(img.shape[:2], np.uint8)
-    mask[:] = 2
-    mask[erosion == 255] = 1
-    bgdmodel = np.zeros((1, 65), np.float64)
-    fgdmodel = np.zeros((1, 65), np.float64)
-
-    out_mask = mask.copy()
-    out_mask, _, _ = cv2.grabCut(img,out_mask,None,bgdmodel,fgdmodel,1,cv2.GC_INIT_WITH_MASK)
-    out_mask = np.where((out_mask==2)|(out_mask==0),0,1).astype('uint8')
-    img_removed_bg = img*out_mask[:,:,np.newaxis]
-    removed_bg_image_path = os.path.join(app.config['UPLOAD'], 'img_removed_bg.jpg')
-    cv2.imwrite(removed_bg_image_path, img_removed_bg)
-
-    return removed_bg_image_path
-
-@app.route('/removeBackground', methods=['GET', 'POST'])
+@app.route('/background_remove', methods=['GET', 'POST'])
 def removebg():
-    error = None
     if request.method == 'POST':
-        # Check if the 'img' file is in the request
         if 'img' not in request.files:
-            error = 'Please Select a Picture'
-            return render_template('remove_bg.html', error=error)
+            return render_template('remove_bg.html', error='No image file uploaded')
 
-        file = request.files['img']
+        img_file = request.files['img']
 
-        # Check if the file name is empty
-        if file.filename == '':
-            error = 'Please Select a Picture'
-            return render_template('remove_bg.html', error=error)
+        if img_file.filename == '':
+            return render_template('remove_bg.html', error='No selected image')
 
-        # Check if the file is allowed (e.g., only image files)
-        allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
-        if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
-            error = 'File is not allowed'
-            return render_template('remove_bg.html', error=error)
+        if img_file:
+            input_image_path = os.path.join(app.config['UPLOAD'], 'background_input.png')
+            output_image_path = os.path.join(app.config['UPLOAD'], 'background_output.png')
 
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD'], filename))
-        image_path = os.path.join(app.config['UPLOAD'], filename)
+            img_file.save(input_image_path)
+            remove_background(input_image_path, output_image_path)
 
-        # Call the function to remove the background
-        remove_background_img = remove_bg(image_path)
-
-        return render_template('remove_bg.html', img=image_path, img2=remove_background_img)
+            return render_template('remove_bg.html', input_img=input_image_path, output_img=output_image_path)
 
     return render_template('remove_bg.html')
 
 
-#-----------------------------------------------------------------
+def remove_background(input_image_path, output_image_path):
+    # Use the rembg library to remove the background
+    with open(input_image_path, 'rb') as input_file:
+        with open(output_image_path, 'wb') as output_file:
+            output_file.write(remove(input_file.read()))
+
+
 
 def merge_two_images(image_path1, image_path2, width, height):
     img1 = cv2.imread(image_path1)
