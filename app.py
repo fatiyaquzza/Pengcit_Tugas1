@@ -7,17 +7,24 @@ import cv2
 import numpy as np
 from PIL import Image
 import tensorflow as tf
-import urllib
+from flask import send_file
+from io import BytesIO
+from flask import request, render_template, send_file
+
 
 app = Flask(__name__)
 
 upload_folder = os.path.join('static', 'uploads')
+app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png'}
 
 app.config['UPLOAD'] = upload_folder
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/')
 def home():
     return render_template('home.html')
+
 
 
 @app.route('/histogram', methods=['GET', 'POST'])
@@ -257,5 +264,150 @@ def removebg():
 
     return render_template('remove_bg.html')
 
-if __name__ == '__main__': 
-    app.run(debug=True,port=8001)
+
+#-----------------------------------------------------------------
+
+def merge_two_images(image_path1, image_path2, width, height):
+    img1 = cv2.imread(image_path1)
+    img2 = cv2.imread(image_path2)
+
+    # Pastikan gambar memiliki dimensi yang sama
+    img1 = cv2.resize(img1, (width, height))
+    img2 = cv2.resize(img2, (width, height))
+
+    # Lakukan penggabungan gambar setelah mereka memiliki dimensi yang sama
+    merged_image = cv2.addWeighted(img1, 0.5, img2, 0.5, 0)
+
+    return merged_image
+
+
+@app.route('/mergeImages', methods=['GET', 'POST'])
+def merge_images():
+    if request.method == 'POST':
+        # Check if the 'img' file is in the request
+        file1 = request.files['img1']
+        file2 = request.files['img2']
+
+        filename1 = secure_filename(file1.filename)
+        filename2 = secure_filename(file2.filename)
+
+        file2.save(os.path.join(app.config['UPLOAD'], filename2))
+        file1.save(os.path.join(app.config['UPLOAD'], filename1))
+        image_path = os.path.join(app.config['UPLOAD'], filename1)
+        image_path2 = os.path.join(app.config['UPLOAD'], filename2)
+        width = 640  # Ganti dengan lebar yang sesuai
+        height = 480  # Ganti dengan tinggi yang sesuai
+
+        merged_image = merge_two_images(
+            os.path.join(app.config['UPLOAD'], filename1),
+            os.path.join(app.config['UPLOAD'], filename2),
+            width,
+            height
+        )
+
+        merged_image_path = os.path.join(app.config['UPLOAD'], 'merged_image.jpg')
+        cv2.imwrite(merged_image_path, merged_image)
+        return render_template('merge_images.html', merged_image=merged_image_path, img = image_path, img2 = image_path2)
+
+    return render_template('merge_images.html')
+
+def cartoonize_1(img, k):
+    # Convert the input image to gray scale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Peform adaptive threshold
+    edges = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 9, 8)
+    # Defining input data for clustering
+    data = np.float32(img).reshape((-1, 3))
+
+    # Defining criteria
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 20, 1.0)
+    # Applying cv2.kmeans function
+    _, label, center = cv2.kmeans(data, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    center = np.uint8(center)
+
+    # Reshape the output data to the size of input image
+    result = center[label.flatten()]
+    result = result.reshape(img.shape)
+    #cv2.imshow("result", result)
+    # Smooth the result
+    blurred = cv2.medianBlur(result, 3)
+    # Combine the result and edges to get final cartoon effect
+    cartoon = cv2.bitwise_and(blurred, blurred, mask=edges)
+    car_img = os.path.join(app.config['UPLOAD'], 'cartoon_hasil.jpg')
+    cv2.imwrite(car_img, cartoon)
+    return car_img
+
+@app.route('/cartoonImg', methods=['GET', 'POST'])
+def predict():
+    error = None
+    if request.method == 'POST':
+        # Check if the 'img' file is in the request
+        if 'img' not in request.files:
+            error = 'Please Select a Picture'
+            return render_template('predict.html', error=error)
+
+        file = request.files['img']
+
+        # Check if the file name is empty
+        if file.filename == '':
+           error = 'Please Select a Picture'
+           return render_template('predict.html', error=error)
+
+        # Check if the file is allowed (e.g., only image files)
+        allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
+        if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+            error = 'File is not allowed'
+            return render_template('predict.html', error=error)
+
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        image_path = os.path.join(app.config['UPLOAD'], filename)
+
+        # Load the image file into a NumPy array
+        img = cv2.imread(image_path)
+
+        # Call the function to apply camera lens effect
+        lens_effect_image_path = cartoonize_1(img, 6)
+
+        return render_template('predict.html', img=image_path, img2=lens_effect_image_path)
+
+    return render_template('predict.html')
+
+def apply_lomo_effect(img):
+    # Menerapkan modifikasi warna dengan memindahkan komponen warna merah dan biru
+    img[:, :, 2] = np.clip(img[:, :, 2] * 1.2, 0, 255)  # Komponen warna merah
+    img[:, :, 1] = np.clip(img[:, :, 1] * 1.1, 0, 255)  # Komponen warna hijau
+    img[:, :, 0] = np.clip(img[:, :, 0] * 0.9, 0, 255)  # Komponen warna biru
+
+    # Menyimpan gambar dengan efek lomo ke folder "static/uploads"
+    lomo_image_path = os.path.join(app.config['UPLOAD'], 'lomo_image.jpg')
+    cv2.imwrite(lomo_image_path, img)
+
+    return lomo_image_path
+
+@app.route('/lomoEffect', methods=['GET', 'POST'])
+def lomo_effect():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        # Membaca gambar dengan OpenCV
+        img = cv2.imread(img_path)
+
+        # Memanggil fungsi apply_lomo_effect
+        lomo_image_path = apply_lomo_effect(img)
+
+        return render_template('lomo.html', img=img_path, img2=lomo_image_path)
+    
+    return render_template('lomo.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=8001)
+
+
+
+
+  

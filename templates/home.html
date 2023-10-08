@@ -37,6 +37,18 @@
     <li>
       <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
   </li>
+  <li>
+    <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
+</li>
+  <li>
+    <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
+</li>
+<li>
+    <a href="{{ url_for('predict') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Cartoonize</a>
+</li>
+<li>
+    <a href="{{ url_for('lomo_effect') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lomo Effect</a>
+</li>
   </ul>
 </div>
 
@@ -112,7 +124,6 @@
                               Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
                           </p>
                       </div>
-                  
               </div>
           </div>
       </div>
@@ -127,17 +138,75 @@
                     <h2 class="mt-4 mb-6 font-semibold 
                     lg:text-4xl md:text-4xl sm:text-xl text-xl">Remove Background</h2>
                 </div>
-
                 <div class="border-t">
-                        <div class="w-full p-6 ">
-                            <p class="text-sm leading-loose">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                            </p>
-                        </div>
-                    
-                </div>
+                    <div class="w-full p-6 ">
+                        <p class="text-sm leading-loose">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
+                        </p>
+                    </div>
+            </div>     
             </div>
-      </div>
+        </div>
+
+        <div class="flex justify-center w-full lg:w-1/2 mb-8">
+            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('merge_images') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Merge Images</h2>
+                </div>
+                <div class="border-t">
+                    <div class="w-full p-6 ">
+                        <p class="text-sm leading-loose">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
+                        </p>
+                    </div>
+            </div>     
+            </div>
+        </div>
+
+        <div class="flex justify-center w-full lg:w-1/2 mb-8">
+            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('predict') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Cartoonize</h2>
+                </div>
+                <div class="border-t">
+                    <div class="w-full p-6 ">
+                        <p class="text-sm leading-loose">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
+                        </p>
+                    </div>
+            </div>     
+            </div>
+        </div>
+
+        <div class="flex justify-center w-full lg:w-1/2 mb-8">
+            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('lomo_effect') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Lomo Effect</h2>
+                </div>
+                <div class="border-t">
+                    <div class="w-full p-6 ">
+                        <p class="text-sm leading-loose">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
+                        </p>
+                    </div>
+            </div>     
+            </div>
+        </div>
 
     </section>
 
