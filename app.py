@@ -370,6 +370,69 @@ def lomo_effect():
     
     return render_template('lomo.html')
 
+def erode_image(image_path):
+    img = cv2.imread(image_path, 0)
+
+    # Binerisasi gambar
+    _, binarized = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
+
+    # Membuat kernel
+    kernel = np.ones((5, 5), np.uint8)
+
+    # Inversi gambar
+    inverted = cv2.bitwise_not(binarized)
+
+    # Erosi gambar
+    erosion = cv2.erode(inverted, kernel, iterations=1) #erosi dan dilasi tinggal ubah di cv2.erode dan cv2.dilate aja yah
+    
+    return erosion
+
+@app.route('/erosion', methods=['GET', 'POST'])
+def erosion():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+        file.save(img_path)
+            
+        eroded_image = erode_image(img_path)
+        eroded_image_path = os.path.join(app.config['UPLOAD'], 'eroded_' + filename)
+        cv2.imwrite(eroded_image_path, eroded_image)
+        return render_template('erosion.html', img=img_path, img2=eroded_image_path)
+    
+    return render_template('erosion.html')
+
+def dilate_image(image_path):
+    img = cv2.imread(image_path, 0)
+
+    # Binerisasi gambar
+    _, binarized = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
+
+    # Membuat kernel
+    kernel = np.ones((5, 5), np.uint8)
+
+    # Inversi gambar
+    inverted = cv2.bitwise_not(binarized)
+
+    # Erosi gambar
+    dilate = cv2.dilate(inverted, kernel, iterations=1) #erosi dan dilasi tinggal ubah di cv2.erode dan cv2.dilate aja yah
+    
+    return dilate
+
+@app.route('/dilate', methods=['GET', 'POST'])
+def dilate():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+        file.save(img_path)
+            
+        dilated_image = dilate_image(img_path)
+        dilated_image_path = os.path.join(app.config['UPLOAD'], 'eroded_' + filename)
+        cv2.imwrite(dilated_image_path, dilated_image)
+        return render_template('dilate.html', img=img_path, img2=dilated_image_path)
+    
+    return render_template('dilate.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
