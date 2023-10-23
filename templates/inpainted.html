@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartoon</title>
+    <title>Segmentasi</title>
     <link rel="stylesheet" href="/static/css/main.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
@@ -22,34 +22,34 @@
 </svg></button>
 <!-- Dropdown menu -->
 <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-<ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-<li>
-  <a href="{{ url_for('home') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
-</li>
-<li>
-  <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
-</li>
-<li>
-  <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
-</li>
-<li>
-  <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
-</li>
-</li>
-<li>
-  <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
-</li>
-<li>
-  <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
-</li>
-<li>
-    <a href="{{ url_for('predict') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Cartoonize</a>
+  <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+  <li>
+    <a href="{{ url_for('home') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
   </li>
   <li>
-    <a href="{{ url_for('lomo_effect') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lomo Effect</a>
-</li>
-</ul>
-</div>
+    <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
+  </li>
+  <li>
+    <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
+  </li>
+  <li>
+    <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
+  </li>
+  </li>
+  <li>
+    <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
+  </li>
+  <li>
+    <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
+  </li>
+  <li>
+      <a href="{{ url_for('predict') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Cartoonize</a>
+    </li>
+    <li>
+      <a href="{{ url_for('lomo_effect') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lomo Effect</a>
+  </li>
+  </ul>
+  </div>
 
   <h3 class=" font-bold text-3xl"> Pengolahan Citra </h3>
 
@@ -64,11 +64,11 @@
     <h2
     class="text-center lg:text-7xl md:text-6xl sm:text-5xl text-4xl font-medium py-16 mx-10 mb-12 bg-indigo-300 bg-opacity-10 text-white rounded-xl"
   >
-    Cartoon Effect
+    Segmentasi Objek
     </h2>
 
     <form
-        action="{{ url_for('predict') }}"
+        action="{{ url_for('inpaint_image_route') }}"
         enctype="multipart/form-data"
         method="POST"
         class=""
@@ -95,9 +95,11 @@
         </div>
         </div>
 
+        <canvas id="canvas" width="200" height="200"></canvas>
+        <input type="hidden" id="roi_coordinates" name="roi_coordinates">
     </form>
 
-    <div class="flex justify-center mt-10 mb-10">
+    <div class="flex justify-center">
         <div class="mr-10">
           {% if img %}
           <h4 class="text-center font-medium text-2xl text-white mb-6">
@@ -110,12 +112,13 @@
         <div class="mr-10">
           {% if img2 %}
           <h4 class="text-center font-medium text-2xl text-white mb-6">
-            Gambar Setelah
+            Gambar setelah dihilangkan background
           </h4>
           <img src="{{ img2 }}" class="w-[500px]" />
           {% endif %}
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+  
 </body>
 </html>
