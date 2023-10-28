@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Histogram Equalization</title>
+    <title>Dilation</title>
     <link rel="stylesheet" href="/static/css/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,6 +49,12 @@
   <li>
     <a href="{{ url_for('lomo_effect') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lomo Effect</a>
 </li>
+<li>
+  <a href="{{ url_for('erosion') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Erosion</a>
+</li>
+<li>
+    <a href="{{ url_for('dilate') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dilate</a>
+  </li>
 </ul>
 </div>
 
@@ -66,11 +72,11 @@
       <h2
         class="text-center lg:text-7xl md:text-6xl sm:text-5xl text-4xl font-medium py-16 mx-10 mb-12 bg-indigo-300 bg-opacity-10 text-white rounded-xl"
       >
-        Histogram Equalization
+        Dilation
       </h2>
 
       <form
-        action="{{ url_for('histogram_equ') }}"
+        action="{{ url_for('dilate') }}"
         enctype="multipart/form-data"
         method="POST"
         class=""
@@ -111,34 +117,15 @@
         </div>
 
         <div>
-          {% if histogram %}
-          <h4 class="text-center font-medium text-2xl text-white mb-6">
-            Histogram Awal
-          </h4>
-          <img src="{{ histogram }}" class="w-[500px]" />
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="flex justify-center mt-20">
-        <div class="mr-10">
           {% if img2 %}
           <h4 class="text-center font-medium text-2xl text-white mb-6">
-            Gambar setelah Equalization
+            Gambar hasil dilasi
           </h4>
           <img src="{{ img2 }}" class="w-[500px]" />
           {% endif %}
         </div>
-
-        <div>
-          {% if histogram2 %}
-          <h4 class="text-center font-medium text-2xl text-white mb-6">
-            Histogram setelah Equalization
-          </h4>
-          <img src="{{ histogram2 }}" class="w-[500px]" />
-          {% endif %}
-        </div>
       </div>
+
     </section>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>

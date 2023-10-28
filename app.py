@@ -9,8 +9,7 @@ from PIL import Image
 import tensorflow as tf
 from flask import send_file
 from io import BytesIO
-from flask import request, render_template, send_file
-
+from rembg import remove
 
 app = Flask(__name__)
 
@@ -204,68 +203,36 @@ def face_blur():
 
     return render_template('blur.html')
 
-def remove_bg(image_path):
-    img = cv2.imread(image_path)
-    edges = cv2.Canny(img, 80,150)
-    kernel = np.ones((5,5), np.uint8)
-    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=3)
-    erosion = cv2.morphologyEx(closing, cv2.MORPH_ERODE, kernel, iterations=1)
-
-    # When using Grabcut the mask image should be:
-    #    0 - sure background
-    #    1 - sure foreground
-    #    2 - unknown
-
-    mask = np.zeros(img.shape[:2], np.uint8)
-    mask[:] = 2
-    mask[erosion == 255] = 1
-    bgdmodel = np.zeros((1, 65), np.float64)
-    fgdmodel = np.zeros((1, 65), np.float64)
-
-    out_mask = mask.copy()
-    out_mask, _, _ = cv2.grabCut(img,out_mask,None,bgdmodel,fgdmodel,1,cv2.GC_INIT_WITH_MASK)
-    out_mask = np.where((out_mask==2)|(out_mask==0),0,1).astype('uint8')
-    img_removed_bg = img*out_mask[:,:,np.newaxis]
-    removed_bg_image_path = os.path.join(app.config['UPLOAD'], 'img_removed_bg.jpg')
-    cv2.imwrite(removed_bg_image_path, img_removed_bg)
-
-    return removed_bg_image_path
-
-@app.route('/removeBackground', methods=['GET', 'POST'])
+@app.route('/background_remove', methods=['GET', 'POST'])
 def removebg():
-    error = None
     if request.method == 'POST':
-        # Check if the 'img' file is in the request
         if 'img' not in request.files:
-            error = 'Please Select a Picture'
-            return render_template('remove_bg.html', error=error)
+            return render_template('remove_bg.html', error='No image file uploaded')
 
-        file = request.files['img']
+        img_file = request.files['img']
 
-        # Check if the file name is empty
-        if file.filename == '':
-            error = 'Please Select a Picture'
-            return render_template('remove_bg.html', error=error)
+        if img_file.filename == '':
+            return render_template('remove_bg.html', error='No selected image')
 
-        # Check if the file is allowed (e.g., only image files)
-        allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
-        if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
-            error = 'File is not allowed'
-            return render_template('remove_bg.html', error=error)
+        if img_file:
+            input_image_path = os.path.join(app.config['UPLOAD'], 'background_input.png')
+            output_image_path = os.path.join(app.config['UPLOAD'], 'background_output.png')
 
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD'], filename))
-        image_path = os.path.join(app.config['UPLOAD'], filename)
+            img_file.save(input_image_path)
+            remove_background(input_image_path, output_image_path)
 
-        # Call the function to remove the background
-        remove_background_img = remove_bg(image_path)
-
-        return render_template('remove_bg.html', img=image_path, img2=remove_background_img)
+            return render_template('remove_bg.html', input_img=input_image_path, output_img=output_image_path)
 
     return render_template('remove_bg.html')
 
 
-#-----------------------------------------------------------------
+def remove_background(input_image_path, output_image_path):
+    # Use the rembg library to remove the background
+    with open(input_image_path, 'rb') as input_file:
+        with open(output_image_path, 'wb') as output_file:
+            output_file.write(remove(input_file.read()))
+
+
 
 def merge_two_images(image_path1, image_path2, width, height):
     img1 = cv2.imread(image_path1)
@@ -403,6 +370,116 @@ def lomo_effect():
     
     return render_template('lomo.html')
 
+@app.route('/opening', methods=['GET', 'POST'])
+def opening_image():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+
+        # Perform morphological opening
+        img = cv2.imread(img_path)
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        binarized_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        kernel = np.ones((3, 3), np.uint8)
+        opening = cv2.morphologyEx(binarized_img, cv2.MORPH_OPEN, kernel, iterations=1)
+
+        # Save the result to a file
+        opening_image_path = os.path.join(app.config['UPLOAD'], 'opening_image.jpg')
+        cv2.imwrite(opening_image_path, opening)
+
+        return render_template('opening.html', img=img_path, img2=opening_image_path)
+    return render_template('opening.html')
+
+@app.route('/closing', methods=['GET', 'POST'])
+def closing():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+
+        # Perform morphological closing
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        binarized_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        kernel = np.ones((3, 3), np.uint8)
+        closing = cv2.morphologyEx(binarized_img, cv2.MORPH_CLOSE, kernel, iterations=4)
+
+        # Save the result to a file
+        closing_image_path = os.path.join(app.config['UPLOAD'], 'closing_image.jpg')
+        cv2.imwrite(closing_image_path, closing)
+
+        return render_template('closing.html', img=img_path, img2=closing_image_path)
+    return render_template('closing.html')
+
+def erode_image(image_path):
+    img = cv2.imread(image_path, 0)
+
+
+    # Binerisasi gambar
+    _, binarized = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
+
+    # Membuat kernel
+    kernel = np.ones((5, 5), np.uint8)
+
+    # Inversi gambar
+    inverted = cv2.bitwise_not(binarized)
+
+    # Erosi gambar
+    erosion = cv2.erode(inverted, kernel, iterations=1) #erosi dan dilasi tinggal ubah di cv2.erode dan cv2.dilate aja yah
+    
+    return erosion
+
+@app.route('/erosion', methods=['GET', 'POST'])
+def erosion():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+        file.save(img_path)
+            
+        eroded_image = erode_image(img_path)
+        eroded_image_path = os.path.join(app.config['UPLOAD'], 'eroded_' + filename)
+        cv2.imwrite(eroded_image_path, eroded_image)
+        return render_template('erosion.html', img=img_path, img2=eroded_image_path)
+    
+    return render_template('erosion.html')
+
+def dilate_image(image_path):
+    img = cv2.imread(image_path, 0)
+
+    # Binerisasi gambar
+    _, binarized = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
+
+    # Membuat kernel
+    kernel = np.ones((5, 5), np.uint8)
+
+    # Inversi gambar
+    inverted = cv2.bitwise_not(binarized)
+
+    # Erosi gambar
+    dilate = cv2.dilate(inverted, kernel, iterations=1) #erosi dan dilasi tinggal ubah di cv2.erode dan cv2.dilate aja yah
+    
+    return dilate
+
+@app.route('/dilate', methods=['GET', 'POST'])
+def dilate():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+        file.save(img_path)
+            
+        dilated_image = dilate_image(img_path)
+        dilated_image_path = os.path.join(app.config['UPLOAD'], 'eroded_' + filename)
+        cv2.imwrite(dilated_image_path, dilated_image)
+        return render_template('dilate.html', img=img_path, img2=dilated_image_path)
+    
+    return render_template('dilate.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
