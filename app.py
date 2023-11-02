@@ -370,8 +370,55 @@ def lomo_effect():
     
     return render_template('lomo.html')
 
+@app.route('/opening', methods=['GET', 'POST'])
+def opening_image():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+
+        # Perform morphological opening
+        img = cv2.imread(img_path)
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        binarized_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        kernel = np.ones((3, 3), np.uint8)
+        opening = cv2.morphologyEx(binarized_img, cv2.MORPH_OPEN, kernel, iterations=1)
+
+        # Save the result to a file
+        opening_image_path = os.path.join(app.config['UPLOAD'], 'opening_image.jpg')
+        cv2.imwrite(opening_image_path, opening)
+
+        return render_template('opening.html', img=img_path, img2=opening_image_path)
+    return render_template('opening.html')
+
+@app.route('/closing', methods=['GET', 'POST'])
+def closing():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+
+        # Perform morphological closing
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        binarized_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        kernel = np.ones((3, 3), np.uint8)
+        closing = cv2.morphologyEx(binarized_img, cv2.MORPH_CLOSE, kernel, iterations=4)
+
+        # Save the result to a file
+        closing_image_path = os.path.join(app.config['UPLOAD'], 'closing_image.jpg')
+        cv2.imwrite(closing_image_path, closing)
+
+        return render_template('closing.html', img=img_path, img2=closing_image_path)
+    return render_template('closing.html')
+
 def erode_image(image_path):
     img = cv2.imread(image_path, 0)
+
 
     # Binerisasi gambar
     _, binarized = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
