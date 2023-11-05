@@ -524,8 +524,8 @@ def scaling_02():
         cv2.imwrite(scaled_image_path, sclaed_img)
 
 
-        return render_template('bilinear.html', img=img_path, img2=scaled_image_path)
-    return render_template('bilinear.html')
+        return render_template('bicubic.html', img=img_path, img2=scaled_image_path)
+    return render_template('bicubic.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
