@@ -23,33 +23,50 @@
 </svg></button>
 <!-- Dropdown menu -->
 <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-<ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-<li>
-  <a href="{{ url_for('home') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
+  <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+    <li>
+      <a href="{{ url_for('home') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
+    </li>
+    <li>
+      <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
+    </li>
+    <li>
+      <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
+    </li>
+    <li>
+      <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
+  </li>
+  <li>
+    <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
 </li>
-<li>
-  <a href="{{ url_for('histogram_equ') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Histogram Equalization</a>
-</li>
-<li>
-  <a href="{{ url_for('edge') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edge</a>
-</li>
-<li>
-  <a href="{{ url_for('face_blur') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Face Blur</a>
-</li>
-</li>
-<li>
-  <a href="{{ url_for('removebg') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Remove Background</a>
-</li>
-<li>
-  <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
+  <li>
+    <a href="{{ url_for('merge_images') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Merge Images</a>
 </li>
 <li>
     <a href="{{ url_for('predict') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Cartoonize</a>
-  </li>
-  <li>
+</li>
+<li>
     <a href="{{ url_for('lomo_effect') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lomo Effect</a>
 </li>
-</ul>
+<li>
+    <a href="{{ url_for('opening_image') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Opening Fiture</a>
+</li>
+<li>
+    <a href="{{ url_for('closing') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Closing Fiture</a>
+</li>
+<li>
+  <a href="{{ url_for('erosion') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Erosion</a>
+</li>
+<li>
+    <a href="{{ url_for('dilate') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dilation</a>
+  </li>
+  <li>
+    <a href="{{ url_for('scaling') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Bilinear Interpolation</a>
+  </li>
+  <li>
+    <a href="{{ url_for('scaling_02') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Bicubic Interpolation</a>
+  </li>
+  </ul>
 </div>
 
       <h3 class=" font-bold text-3xl"> Pengolahan Citra </h3>
@@ -87,7 +104,7 @@
               name="img"
               id="img"
               type="file"
-              class="m-0 block w-full min-w-0 flex-auto cursor-pointer rounded-lg  bg-clip-padding  py-[0.32rem] font-normal leading-[2.15] bg-gray-200 text-black transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600"
+              class="m-0 block w-full min-w-0 flex-auto cursor-pointer rounded-lg  bg-clip-padding  py-[0.32rem] font-normal leading-[2.15] bg-gray-200 text-black transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600" required
             />
 
             <input
