@@ -1,14 +1,10 @@
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 import os
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-from PIL import Image
-import tensorflow as tf
-from flask import send_file
-from io import BytesIO
 from rembg import remove
 
 app = Flask(__name__)
@@ -480,6 +476,56 @@ def dilate():
         return render_template('dilate.html', img=img_path, img2=dilated_image_path)
     
     return render_template('dilate.html')
+
+@app.route('/scaling', methods=['GET', 'POST'])
+def scaling():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+
+        # Mendefinisikan scale
+        scale_x = float(request.form['scale_x'])  
+        scale_y = float(request.form['scale_y'])  
+
+        # scaling menggunakan bilinear interpolation
+        scaled_img = cv2.resize(img, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_LINEAR)
+
+        # Menyimpan gambar
+        scaled_image_path = os.path.join(app.config['UPLOAD'], 'scaled_image.jpg')
+        cv2.imwrite(scaled_image_path, scaled_img)
+
+        return render_template('bilinear.html', img=img_path, img2=scaled_image_path)
+    return render_template('bilinear.html')
+
+@app.route('/scaling_02', methods=['GET', 'POST'])
+def scaling_02():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+
+        # Mendefinisikan scale
+        scale_x = float(request.form['scale_x'])  
+        scale_y = float(request.form['scale_y'])  
+
+
+         # scaling menggunakan bicubic interpolation
+        sclaed_img = cv2.resize(img, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_CUBIC)
+
+        # # Menyimpan gambar
+        scaled_image_path = os.path.join(app.config['UPLOAD'], 'scaled_image.jpg')
+        cv2.imwrite(scaled_image_path, sclaed_img)
+
+
+        return render_template('bilinear.html', img=img_path, img2=scaled_image_path)
+    return render_template('bilinear.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
