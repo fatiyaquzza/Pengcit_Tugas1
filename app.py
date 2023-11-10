@@ -518,19 +518,54 @@ def scaling_02():
         scale_x = float(request.form['scale_x'])  
         scale_y = float(request.form['scale_y'])  
 
-
          # scaling menggunakan bicubic interpolation
-        sclaed_img = cv2.resize(img, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_CUBIC)
+        scaled_img = cv2.resize(img, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_CUBIC)
 
         # # Menyimpan gambar
         scaled_image_path = os.path.join(app.config['UPLOAD'], 'scaled_image.jpg')
-        cv2.imwrite(scaled_image_path, sclaed_img)
+        cv2.imwrite(scaled_image_path, scaled_img)
 
         img_matrix = cv2.imread(scaled_image_path, 0)  # Mode 0 untuk grayscale, 1 untuk RGB
         img_matrix_list = img_matrix.tolist()
 
         return render_template('bicubic.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
     return render_template('bicubic.html')
+
+@app.route('/saltnpeper', methods=['GET', 'POST'])
+def saltnpepper():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+        
+        if request.form.get('filter_type') == 'median':
+            # Membersihkan salt and pepper noise menggunakan filter median
+            median_img = cv2.medianBlur(img, 5)  
+
+            # Menyimpan gambar yang telah dibersihkan
+            median_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image.jpg')
+            cv2.imwrite(median_clean_img, median_img)
+
+            filter_type = request.form.get('filter_type', None)
+
+            return render_template('saltnpepper.html', img=img_path, img2=median_clean_img, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'lowpass':
+            # Membersihkan gambar menggunakan filter low-pass (Gaussian blur)
+            lowpass_img = cv2.GaussianBlur(img, (5, 5), 0)
+
+            # Menyimpan gambar yang telah dibersihkan
+            lowpass_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_lowpass.jpg')
+            cv2.imwrite(lowpass_clean_img, lowpass_img)
+
+            filter_type = request.form.get('filter_type', None)
+
+            return render_template('saltnpepper.html', img=img_path, img2=lowpass_clean_img, filter_type=filter_type)
+    
+    return render_template('saltnpepper.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
