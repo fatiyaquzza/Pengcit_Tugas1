@@ -498,7 +498,10 @@ def scaling():
         scaled_image_path = os.path.join(app.config['UPLOAD'], 'scaled_image.jpg')
         cv2.imwrite(scaled_image_path, scaled_img)
 
-        return render_template('bilinear.html', img=img_path, img2=scaled_image_path)
+        img_matrix = cv2.imread(scaled_image_path, 0)  # Mode 0 untuk grayscale, 1 untuk RGB
+        img_matrix_list = img_matrix.tolist()
+
+        return render_template('bilinear.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
     return render_template('bilinear.html')
 
 @app.route('/scaling_02', methods=['GET', 'POST'])
@@ -523,8 +526,10 @@ def scaling_02():
         scaled_image_path = os.path.join(app.config['UPLOAD'], 'scaled_image.jpg')
         cv2.imwrite(scaled_image_path, sclaed_img)
 
+        img_matrix = cv2.imread(scaled_image_path, 0)  # Mode 0 untuk grayscale, 1 untuk RGB
+        img_matrix_list = img_matrix.tolist()
 
-        return render_template('bicubic.html', img=img_path, img2=scaled_image_path)
+        return render_template('bicubic.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
     return render_template('bicubic.html')
 
 if __name__ == '__main__':

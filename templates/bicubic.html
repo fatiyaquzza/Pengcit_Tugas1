@@ -124,12 +124,27 @@
 
 
           {% if img2 %}
-        <h4 class="text-center font-medium text-2xl text-white mb-3">
-            Gambar setelah interpolasi bicubic
-        </h4>
-        <div class="flex justify-center mb-10">
-          <img src="{{ img2 }}"  />
-        </div>
+          <div class="flex justify-center mb-10">
+            <div style="margin-left: 100px; overflow: auto;">
+              <h4 class="text-center font-medium text-2xl text-white mb-3">
+                  Gambar setelah interpolasi bicubic
+              </h4>
+                <img src="{{ img2 }}"  />
+              </div>
+              
+            <div style="margin-left: 100px; overflow: auto;">
+                  <h2 class="text-center font-medium text-2xl text-white">Pixel Matrix (Bicubic)</h2>
+                  <table style="border: 2px solid black; border-collapse: collapse;">
+                      {% for row in img2_data[:10] %}
+                      <tr>
+                          {% for pixel in row[:10] %}
+                          <td style="width: 10px; height: 10px; border: 2px solid black; font-size: 20px; padding: 5px;">{{ pixel }}</td>
+                          {% endfor %}
+                      </tr>
+                      {% endfor %}
+                  </table>
+              </div>
+          </div>
           {% endif %}
     </div>
 
