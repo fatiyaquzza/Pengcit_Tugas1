@@ -94,6 +94,12 @@
             <button type="submit" name="filter_type" value="lowpass" class="items-center px-10 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-stone-700 border-stone-800 rounded-md shadow-[0_4px_9px_-4px_#a8a29e] hover:bg-stone-800 ml-4 hover:shadow-[0_8px_9px_-4px_#a8a29e,0_4px_18px_0_#a8a29e]">
               Lowpass Filter
             </button>
+            <button type="submit" name="filter_type" value="rank-order" class="items-center px-10 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-stone-700 border-stone-800 rounded-md shadow-[0_4px_9px_-4px_#a8a29e] hover:bg-stone-800 ml-4 hover:shadow-[0_8px_9px_-4px_#a8a29e,0_4px_18px_0_#a8a29e]">
+              Rank-Order Filter
+            </button>
+            <button type="submit" name="filter_type" value="outlier" class="items-center px-10 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-stone-700 border-stone-800 rounded-md shadow-[0_4px_9px_-4px_#a8a29e] hover:bg-stone-800 ml-4 hover:shadow-[0_8px_9px_-4px_#a8a29e,0_4px_18px_0_#a8a29e]">
+              Outlier Filter
+            </button>
           </div>
           
       </div>
@@ -144,6 +150,58 @@
             <div>
                 <h4 class="text-center font-medium text-2xl text-white mb-3">
                     Gambar setelah Lowpass Filter
+                </h4>
+                <div class="flex justify-center" style="overflow: auto;">
+                    <img src="{{ img2 }}" />
+                </div>
+            </div>
+        {% endif %}
+    </div>
+  {% endif %}
+
+  {% if filter_type == 'rank-order' %}
+    <div class="flex justify-center">
+        {% if img %}
+            <div class="mr-5">
+                <h4 class="text-center font-medium text-2xl text-white mb-3">
+                    Gambar Awal
+                </h4>
+                <div class="flex justify-center" style="overflow: auto;">
+                    <img src="{{ img }}" />
+                </div>
+            </div>
+        {% endif %}
+
+        {% if img2 %}
+            <div>
+                <h4 class="text-center font-medium text-2xl text-white mb-3">
+                    Gambar setelah Rank-Order Filter
+                </h4>
+                <div class="flex justify-center" style="overflow: auto;">
+                    <img src="{{ img2 }}" />
+                </div>
+            </div>
+        {% endif %}
+    </div>
+  {% endif %}
+
+  {% if filter_type == 'outlier' %}
+    <div class="flex justify-center">
+        {% if img %}
+            <div class="mr-5">
+                <h4 class="text-center font-medium text-2xl text-white mb-3">
+                    Gambar Awal
+                </h4>
+                <div class="flex justify-center" style="overflow: auto;">
+                    <img src="{{ img }}" />
+                </div>
+            </div>
+        {% endif %}
+
+        {% if img2 %}
+            <div>
+                <h4 class="text-center font-medium text-2xl text-white mb-3">
+                    Gambar setelah Outlier Filter
                 </h4>
                 <div class="flex justify-center" style="overflow: auto;">
                     <img src="{{ img2 }}" />
