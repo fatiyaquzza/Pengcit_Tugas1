@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+from scipy import ndimage
 from rembg import remove
 
 app = Flask(__name__)
@@ -531,49 +532,36 @@ def scaling_02():
         return render_template('bicubic.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
     return render_template('bicubic.html')
 
-def rank_order_filter(image, kernel_size=3, rank=0.5):
-    # Menerapkan rank-order filtering dengan rank tertentu
-    # rank = 0.5 untuk median, < 0.5 untuk nilai yang lebih rendah, > 0.5 untuk nilai yang lebih tinggi
-    rows, cols = image.shape[:2]
-    margin = kernel_size // 2
-    output_image = np.zeros((rows, cols), dtype=image.dtype)
+def rank_order_filter(img, footprint):
+    # Convert to grayscale as the rank order filter example seems designed for single-channel
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    for i in range(margin, rows - margin):
-        for j in range(margin, cols - margin):
-            window = image[i - margin:i + margin + 1, j - margin:j + margin + 1]
-            output_image[i, j] = np.sort(window.ravel())[int(rank * (kernel_size * kernel_size))]
     
-    return output_image
+    # Apply the rank order median filter
+    filtered_img = ndimage.median_filter(gray_img, footprint=footprint)
+    
+    # Convert back to BGR for consistency with input
+    filtered_img_bgr = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+    
+    return filtered_img_bgr
 
-def outlier_filter(image, kernel_size=3, threshold=50):
-    if len(image.shape) > 2 and image.shape[2] == 3:
-        rows, cols, channels = image.shape
-        margin = kernel_size // 2
-        output_image = image.copy()
-        
-        for i in range(margin, rows - margin):
-            for j in range(margin, cols - margin):
-                for c in range(channels):
-                    window = image[i - margin:i + margin + 1, j - margin:j + margin + 1, c]
-                    median = np.median(window)
-                    if abs(image[i, j, c] - median) > threshold:
-                        output_image[i, j, c] = median
-        
-        return output_image
+def outlier_method(img, D=0.2):
+    # Convert to grayscale as the algorithm seems designed for single-channel
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    if len(image.shape) == 2 or image.shape[2] != 3:
-        rows, cols = image.shape
-        margin = kernel_size // 2
-        output_image = image.copy()
-        
-        for i in range(margin, rows - margin):
-            for j in range(margin, cols - margin):
-                window = image[i - margin:i + margin + 1, j - margin:j + margin + 1]
-                median = np.median(window)
-                if abs(image[i, j] - median) > threshold:
-                    output_image[i, j] = median
-        
-        return output_image
+    # Kernel for neighborhood averaging
+    av = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]]) / 8.0
+    
+    # Apply neighborhood averaging
+    mean_neighbors = ndimage.convolve(gray_img, av, mode='nearest')
+
+    # Detecting outliers
+    outliers = np.abs(gray_img - mean_neighbors) > D
+
+    # Replacing outlier pixel values with the mean of their neighbors
+    gray_img[outliers] = mean_neighbors[outliers]
+
+    return gray_img
 
 @app.route('/saltnpeper', methods=['GET', 'POST'])
 def saltnpepper():
@@ -610,28 +598,31 @@ def saltnpepper():
             return render_template('saltnpepper.html', img=img_path, img2=lowpass_clean_img, filter_type=filter_type)
         
         if request.form.get('filter_type') == 'rank-order':
-            # Menggunakan rank-order filtering
-            rank_order_img = rank_order_filter(img)
+            # Define the non-rectangular mask (cross-shaped)
+            cross = np.array([[0,1,0],[1,1,1],[0,1,0]])
 
-            # Menyimpan gambar yang telah dibersihkan
-            rank_order_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_rank_order.jpg')
-            cv2.imwrite(rank_order_clean_img, rank_order_img)
+            # Apply the rank order filter
+            filtered_img = rank_order_filter(img, cross)
 
-            filter_type = request.form.get('filter_type', None)
+            # Save the filtered image
+            filtered_img_path = os.path.join(app.config['UPLOAD'], 'filtered_image.jpg')
+            cv2.imwrite(filtered_img_path, filtered_img)
 
-            return render_template('saltnpepper.html', img=img_path, img2=rank_order_clean_img, filter_type=filter_type)
+            filter_type = 'rank-order'
+
+            return render_template('saltnpepper.html', img=img_path, img2=filtered_img_path, filter_type=filter_type)
         
         if request.form.get('filter_type') == 'outlier':
-            # Menggunakan outlier filtering
-            outlier_img = outlier_filter(img)
+            # Apply the outlier method
+            cleaned_img = outlier_method(img)
 
-            # Menyimpan gambar yang telah dibersihkan
-            outlier_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_outlier.jpg')
-            cv2.imwrite(outlier_clean_img, outlier_img)
+            # Save the cleaned image
+            cleaned_img_path = os.path.join(app.config['UPLOAD'], 'cleaned_image.jpg')
+            cv2.imwrite(cleaned_img_path, cleaned_img)
 
-            filter_type = request.form.get('filter_type', None)
+            filter_type = 'outlier'
 
-            return render_template('saltnpepper.html', img=img_path, img2=outlier_clean_img, filter_type=filter_type)
+            return render_template('saltnpepper.html', img=img_path, img2=cleaned_img_path, filter_type=filter_type)
     
     return render_template('saltnpepper.html')
 
