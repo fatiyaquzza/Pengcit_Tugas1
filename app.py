@@ -575,7 +575,8 @@ def saltnpepper():
         
         if request.form.get('filter_type') == 'median':
             # Membersihkan salt and pepper noise menggunakan filter median
-            median_img = cv2.medianBlur(img, 5)  
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            median_img = cv2.medianBlur(gray_img, 5)  
 
             # Menyimpan gambar yang telah dibersihkan
             median_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image.jpg')
@@ -586,6 +587,7 @@ def saltnpepper():
             return render_template('saltnpepper.html', img=img_path, img2=median_clean_img, filter_type=filter_type)
         
         if request.form.get('filter_type') == 'lowpass':
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # Membersihkan gambar menggunakan filter low-pass (Gaussian blur)
             lowpass_img = cv2.GaussianBlur(img, (5, 5), 0)
 
