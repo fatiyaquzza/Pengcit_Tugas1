@@ -531,6 +531,50 @@ def scaling_02():
         return render_template('bicubic.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
     return render_template('bicubic.html')
 
+def rank_order_filter(image, kernel_size=3, rank=0.5):
+    # Menerapkan rank-order filtering dengan rank tertentu
+    # rank = 0.5 untuk median, < 0.5 untuk nilai yang lebih rendah, > 0.5 untuk nilai yang lebih tinggi
+    rows, cols = image.shape[:2]
+    margin = kernel_size // 2
+    output_image = np.zeros((rows, cols), dtype=image.dtype)
+    
+    for i in range(margin, rows - margin):
+        for j in range(margin, cols - margin):
+            window = image[i - margin:i + margin + 1, j - margin:j + margin + 1]
+            output_image[i, j] = np.sort(window.ravel())[int(rank * (kernel_size * kernel_size))]
+    
+    return output_image
+
+def outlier_filter(image, kernel_size=3, threshold=50):
+    if len(image.shape) > 2 and image.shape[2] == 3:
+        rows, cols, channels = image.shape
+        margin = kernel_size // 2
+        output_image = image.copy()
+        
+        for i in range(margin, rows - margin):
+            for j in range(margin, cols - margin):
+                for c in range(channels):
+                    window = image[i - margin:i + margin + 1, j - margin:j + margin + 1, c]
+                    median = np.median(window)
+                    if abs(image[i, j, c] - median) > threshold:
+                        output_image[i, j, c] = median
+        
+        return output_image
+    
+    if len(image.shape) == 2 or image.shape[2] != 3:
+        rows, cols = image.shape
+        margin = kernel_size // 2
+        output_image = image.copy()
+        
+        for i in range(margin, rows - margin):
+            for j in range(margin, cols - margin):
+                window = image[i - margin:i + margin + 1, j - margin:j + margin + 1]
+                median = np.median(window)
+                if abs(image[i, j] - median) > threshold:
+                    output_image[i, j] = median
+        
+        return output_image
+
 @app.route('/saltnpeper', methods=['GET', 'POST'])
 def saltnpepper():
     if request.method == 'POST':
@@ -564,6 +608,30 @@ def saltnpepper():
             filter_type = request.form.get('filter_type', None)
 
             return render_template('saltnpepper.html', img=img_path, img2=lowpass_clean_img, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'rank-order':
+            # Menggunakan rank-order filtering
+            rank_order_img = rank_order_filter(img)
+
+            # Menyimpan gambar yang telah dibersihkan
+            rank_order_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_rank_order.jpg')
+            cv2.imwrite(rank_order_clean_img, rank_order_img)
+
+            filter_type = request.form.get('filter_type', None)
+
+            return render_template('saltnpepper.html', img=img_path, img2=rank_order_clean_img, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'outlier':
+            # Menggunakan outlier filtering
+            outlier_img = outlier_filter(img)
+
+            # Menyimpan gambar yang telah dibersihkan
+            outlier_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_outlier.jpg')
+            cv2.imwrite(outlier_clean_img, outlier_img)
+
+            filter_type = request.form.get('filter_type', None)
+
+            return render_template('saltnpepper.html', img=img_path, img2=outlier_clean_img, filter_type=filter_type)
     
     return render_template('saltnpepper.html')
 
