@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+from scipy import ndimage
 from rembg import remove
 
 app = Flask(__name__)
@@ -531,6 +532,37 @@ def scaling_02():
         return render_template('bicubic.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
     return render_template('bicubic.html')
 
+def rank_order_filter(img, footprint):
+    # Convert to grayscale as the rank order filter example seems designed for single-channel
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    
+    # Apply the rank order median filter
+    filtered_img = ndimage.median_filter(gray_img, footprint=footprint)
+    
+    # Convert back to BGR for consistency with input
+    filtered_img_bgr = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+    
+    return filtered_img_bgr
+
+def outlier_method(img, D=0.2):
+    # Convert to grayscale as the algorithm seems designed for single-channel
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Kernel for neighborhood averaging
+    av = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]]) / 8.0
+    
+    # Apply neighborhood averaging
+    mean_neighbors = ndimage.convolve(gray_img, av, mode='nearest')
+
+    # Detecting outliers
+    outliers = np.abs(gray_img - mean_neighbors) > D
+
+    # Replacing outlier pixel values with the mean of their neighbors
+    gray_img[outliers] = mean_neighbors[outliers]
+
+    return gray_img
+
 @app.route('/saltnpeper', methods=['GET', 'POST'])
 def saltnpepper():
     if request.method == 'POST':
@@ -543,7 +575,8 @@ def saltnpepper():
         
         if request.form.get('filter_type') == 'median':
             # Membersihkan salt and pepper noise menggunakan filter median
-            median_img = cv2.medianBlur(img, 5)  
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            median_img = cv2.medianBlur(gray_img, 5)  
 
             # Menyimpan gambar yang telah dibersihkan
             median_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image.jpg')
@@ -554,8 +587,9 @@ def saltnpepper():
             return render_template('saltnpepper.html', img=img_path, img2=median_clean_img, filter_type=filter_type)
         
         if request.form.get('filter_type') == 'lowpass':
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # Membersihkan gambar menggunakan filter low-pass (Gaussian blur)
-            lowpass_img = cv2.GaussianBlur(img, (5, 5), 0)
+            lowpass_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
 
             # Menyimpan gambar yang telah dibersihkan
             lowpass_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_lowpass.jpg')
@@ -564,6 +598,33 @@ def saltnpepper():
             filter_type = request.form.get('filter_type', None)
 
             return render_template('saltnpepper.html', img=img_path, img2=lowpass_clean_img, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'rank-order':
+            # Define the non-rectangular mask (cross-shaped)
+            cross = np.array([[0,1,0],[1,1,1],[0,1,0]])
+
+            # Apply the rank order filter
+            filtered_img = rank_order_filter(img, cross)
+
+            # Save the filtered image
+            filtered_img_path = os.path.join(app.config['UPLOAD'], 'filtered_image.jpg')
+            cv2.imwrite(filtered_img_path, filtered_img)
+
+            filter_type = 'rank-order'
+
+            return render_template('saltnpepper.html', img=img_path, img2=filtered_img_path, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'outlier':
+            # Apply the outlier method
+            cleaned_img = outlier_method(img)
+
+            # Save the cleaned image
+            cleaned_img_path = os.path.join(app.config['UPLOAD'], 'cleaned_image.jpg')
+            cv2.imwrite(cleaned_img_path, cleaned_img)
+
+            filter_type = 'outlier'
+
+            return render_template('saltnpepper.html', img=img_path, img2=cleaned_img_path, filter_type=filter_type)
     
     return render_template('saltnpepper.html')
 
