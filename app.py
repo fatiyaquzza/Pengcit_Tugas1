@@ -589,7 +589,7 @@ def saltnpepper():
         if request.form.get('filter_type') == 'lowpass':
             gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # Membersihkan gambar menggunakan filter low-pass (Gaussian blur)
-            lowpass_img = cv2.GaussianBlur(img, (5, 5), 0)
+            lowpass_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
 
             # Menyimpan gambar yang telah dibersihkan
             lowpass_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_lowpass.jpg')
