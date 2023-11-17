@@ -1,14 +1,11 @@
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 import os
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-from PIL import Image
-import tensorflow as tf
-from flask import send_file
-from io import BytesIO
+from scipy import ndimage
 from rembg import remove
 
 app = Flask(__name__)
@@ -377,12 +374,10 @@ def opening_image():
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD'], filename))
         img_path = os.path.join(app.config['UPLOAD'], filename)
-def erode_image(image_path):
-    img = cv2.imread(image_path, 0)
 
-        img = cv2.imread(img_path)
 
         # Perform morphological opening
+        img = cv2.imread(img_path)
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         binarized_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
         kernel = np.ones((3, 3), np.uint8)
@@ -417,6 +412,9 @@ def closing():
 
         return render_template('closing.html', img=img_path, img2=closing_image_path)
     return render_template('closing.html')
+
+def erode_image(image_path):
+    img = cv2.imread(image_path, 0)
 
 
     # Binerisasi gambar
@@ -479,6 +477,156 @@ def dilate():
         return render_template('dilate.html', img=img_path, img2=dilated_image_path)
     
     return render_template('dilate.html')
+
+@app.route('/scaling', methods=['GET', 'POST'])
+def scaling():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+
+        # Mendefinisikan scale
+        scale_x = float(request.form['scale_x'])  
+        scale_y = float(request.form['scale_y'])  
+
+        # scaling menggunakan bilinear interpolation
+        scaled_img = cv2.resize(img, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_LINEAR)
+
+        # Menyimpan gambar
+        scaled_image_path = os.path.join(app.config['UPLOAD'], 'scaled_image.jpg')
+        cv2.imwrite(scaled_image_path, scaled_img)
+
+        img_matrix = cv2.imread(scaled_image_path, 0)  # Mode 0 untuk grayscale, 1 untuk RGB
+        img_matrix_list = img_matrix.tolist()
+
+        return render_template('bilinear.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
+    return render_template('bilinear.html')
+
+@app.route('/scaling_02', methods=['GET', 'POST'])
+def scaling_02():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+
+        # Mendefinisikan scale
+        scale_x = float(request.form['scale_x'])  
+        scale_y = float(request.form['scale_y'])  
+
+         # scaling menggunakan bicubic interpolation
+        scaled_img = cv2.resize(img, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_CUBIC)
+
+        # # Menyimpan gambar
+        scaled_image_path = os.path.join(app.config['UPLOAD'], 'scaled_image.jpg')
+        cv2.imwrite(scaled_image_path, scaled_img)
+
+        img_matrix = cv2.imread(scaled_image_path, 0)  # Mode 0 untuk grayscale, 1 untuk RGB
+        img_matrix_list = img_matrix.tolist()
+
+        return render_template('bicubic.html', img=img_path, img2=scaled_image_path, img2_data=img_matrix_list)
+    return render_template('bicubic.html')
+
+def rank_order_filter(img, footprint):
+    # Convert to grayscale as the rank order filter example seems designed for single-channel
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    
+    # Apply the rank order median filter
+    filtered_img = ndimage.median_filter(gray_img, footprint=footprint)
+    
+    # Convert back to BGR for consistency with input
+    filtered_img_bgr = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+    
+    return filtered_img_bgr
+
+def outlier_method(img, D=0.2):
+    # Convert to grayscale as the algorithm seems designed for single-channel
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Kernel for neighborhood averaging
+    av = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]]) / 8.0
+    
+    # Apply neighborhood averaging
+    mean_neighbors = ndimage.convolve(gray_img, av, mode='nearest')
+
+    # Detecting outliers
+    outliers = np.abs(gray_img - mean_neighbors) > D
+
+    # Replacing outlier pixel values with the mean of their neighbors
+    gray_img[outliers] = mean_neighbors[outliers]
+
+    return gray_img
+
+@app.route('/saltnpeper', methods=['GET', 'POST'])
+def saltnpepper():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        img_path = os.path.join(app.config['UPLOAD'], filename)
+
+        img = cv2.imread(img_path)
+        
+        if request.form.get('filter_type') == 'median':
+            # Membersihkan salt and pepper noise menggunakan filter median
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            median_img = cv2.medianBlur(gray_img, 5)  
+
+            # Menyimpan gambar yang telah dibersihkan
+            median_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image.jpg')
+            cv2.imwrite(median_clean_img, median_img)
+
+            filter_type = request.form.get('filter_type', None)
+
+            return render_template('saltnpepper.html', img=img_path, img2=median_clean_img, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'lowpass':
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # Membersihkan gambar menggunakan filter low-pass (Gaussian blur)
+            lowpass_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
+
+            # Menyimpan gambar yang telah dibersihkan
+            lowpass_clean_img = os.path.join(app.config['UPLOAD'], 'cleaned_image_lowpass.jpg')
+            cv2.imwrite(lowpass_clean_img, lowpass_img)
+
+            filter_type = request.form.get('filter_type', None)
+
+            return render_template('saltnpepper.html', img=img_path, img2=lowpass_clean_img, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'rank-order':
+            # Define the non-rectangular mask (cross-shaped)
+            cross = np.array([[0,1,0],[1,1,1],[0,1,0]])
+
+            # Apply the rank order filter
+            filtered_img = rank_order_filter(img, cross)
+
+            # Save the filtered image
+            filtered_img_path = os.path.join(app.config['UPLOAD'], 'filtered_image.jpg')
+            cv2.imwrite(filtered_img_path, filtered_img)
+
+            filter_type = 'rank-order'
+
+            return render_template('saltnpepper.html', img=img_path, img2=filtered_img_path, filter_type=filter_type)
+        
+        if request.form.get('filter_type') == 'outlier':
+            # Apply the outlier method
+            cleaned_img = outlier_method(img)
+
+            # Save the cleaned image
+            cleaned_img_path = os.path.join(app.config['UPLOAD'], 'cleaned_image.jpg')
+            cv2.imwrite(cleaned_img_path, cleaned_img)
+
+            filter_type = 'outlier'
+
+            return render_template('saltnpepper.html', img=img_path, img2=cleaned_img_path, filter_type=filter_type)
+    
+    return render_template('saltnpepper.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)

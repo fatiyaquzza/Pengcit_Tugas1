@@ -58,6 +58,15 @@
 <li>
   <a href="{{ url_for('erosion') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Erosion</a>
 </li>
+<li>
+    <a href="{{ url_for('dilate') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dilation</a>
+  </li>
+  <li>
+    <a href="{{ url_for('scaling') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Bilinear Interpolation</a>
+  </li>
+  <li>
+    <a href="{{ url_for('scaling_02') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Bicubic Interpolation</a>
+  </li>
   </ul>
 </div>
 
@@ -71,191 +80,191 @@
       </div>
     </nav>
 
-    <section class="flex flex-wrap justify-center -mb-8">
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-        <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
-                <div class="px-6 pt-6">
+    <section class="flex flex-wrap justify-center mb-8">
+        <div class="flex justify-center mb-8 lg:w-1/4 sm:w-1/3 mx-5">
+        <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6 pb-4">
                     <a href="{{ url_for('histogram_equ') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
 
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Histogram Equalization</h2>
-                </div>
-
-                <div class="border-t">
-                        <div class="w-full p-6 ">
-                            <p class="text-sm leading-loose text-justify">
-                                Histogram equalization is a image processing technique used to enhance the contrast and dynamic range of an image by redistributing the pixel intensities in a way that maximizes the utilization of the available intensity levels. It works by transforming the histogram of an image so that the resulting histogram is approximately uniform, spreading out the pixel values over the entire intensity range. This improves the visibility of details in both dark and bright regions of the image, making it particularly useful for enhancing images with uneven lighting or low contrast.
-                            </p>
-                        </div>
-                
+                    lg:text-3xl sm:text-2xl text-stone-800">Histogram Equalization</h2>
                 </div>
         </div>
         </div>
 
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
                 <div class="px-6 pt-6">
                     <a href="{{ url_for('edge') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
     
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Edge Detection</h2>
+                    lg:text-3xl sm:text-2xl text-stone-800">Edge Detection</h2>
                 </div>
     
-                <div class="border-t">
-                        <div class="w-full p-6 ">
-                            <p class="text-sm leading-loose">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                            </p>
-                        </div>
-                    
-                </div>
             </div>
         </div>
 
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-          <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
               <div class="px-6 pt-6">
                   <a href="{{ url_for('face_blur') }}">
                       <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                   </a>
   
                   <h2 class="mt-4 mb-6 font-semibold 
-                  lg:text-4xl md:text-4xl sm:text-xl text-xl">Blur Face</h2>
+                  lg:text-3xl sm:text-2xl text-stone-800">Blur Face</h2>
               </div>
   
-              <div class="border-t">
-                      <div class="w-full p-6 ">
-                          <p class="text-sm leading-loose">
-                              Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                          </p>
-                      </div>
-              </div>
           </div>
       </div>
 
-      <div class="flex justify-center w-full lg:w-1/2 mb-8">
-            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+      <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
                 <div class="px-6 pt-6">
                     <a href="{{ url_for('removebg') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
 
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Remove Background</h2>
-                </div>
-                <div class="border-t">
-                    <div class="w-full p-6 ">
-                        <p class="text-sm leading-loose">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                        </p>
-                    </div>
-            </div>     
+                    lg:text-3xl sm:text-2xl text-stone-800">Remove Background</h2>
+                </div>    
             </div>
         </div>
 
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
                 <div class="px-6 pt-6">
                     <a href="{{ url_for('merge_images') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
 
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Merge Images</h2>
-                </div>
-                <div class="border-t">
-                    <div class="w-full p-6 ">
-                        <p class="text-sm leading-loose">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                        </p>
-                    </div>
-            </div>     
+                    lg:text-3xl sm:text-2xl text-stone-800">Merge Images</h2>
+                </div>    
             </div>
         </div>
 
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
                 <div class="px-6 pt-6">
                     <a href="{{ url_for('predict') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
 
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Cartoonize</h2>
-                </div>
-                <div class="border-t">
-                    <div class="w-full p-6 ">
-                        <p class="text-sm leading-loose">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                        </p>
-                    </div>
-            </div>     
+                    lg:text-3xl sm:text-2xl text-stone-800">Cartoonize</h2>
+                </div>    
             </div>
         </div>
 
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
                 <div class="px-6 pt-6">
                     <a href="{{ url_for('lomo_effect') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
 
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Lomo Effect</h2>
-                </div>
-                <div class="border-t">
-                    <div class="w-full p-6 ">
-                        <p class="text-sm leading-loose">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                        </p>
-                    </div>
-            </div>     
+                    lg:text-3xl sm:text-2xl text-stone-800">Lomo Effect</h2>
+                </div>    
             </div>
         </div>
 
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('opening_image') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-3xl sm:text-2xl text-stone-800">Opening</h2>
+                </div>    
+            </div>
+        </div>
+
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('closing') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-3xl sm:text-2xl text-stone-800">Closing</h2>
+                </div>    
+            </div>
+        </div>
+
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
                 <div class="px-6 pt-6">
                     <a href="{{ url_for('erosion') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
 
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Erosion</h2>
-                </div>
-                <div class="border-t">
-                    <div class="w-full p-6 ">
-                        <p class="text-sm leading-loose">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                        </p>
-                    </div>
-            </div>     
+                    lg:text-3xl sm:text-2xl text-stone-800">Erosion</h2>
+                </div>    
             </div>
         </div>
 
-        <div class="flex justify-center w-full lg:w-1/2 mb-8">
-            <div class="w-10/12 bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
                 <div class="px-6 pt-6">
                     <a href="{{ url_for('dilate') }}">
                         <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
                     </a>
 
                     <h2 class="mt-4 mb-6 font-semibold 
-                    lg:text-4xl md:text-4xl sm:text-xl text-xl">Dilate</h2>
-                </div>
-                <div class="border-t">
-                    <div class="w-full p-6 ">
-                        <p class="text-sm leading-loose">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum accusamus animi doloribus adipisci ipsum aperiam voluptate illo ab voluptatum, repellendus, itaque quisquam iste nihil explicabo! Cumque libero sit ipsa laborum quod enim laudantium ut quam, nam qui, in voluptatum perspiciatis eaque. Deleniti in ut at. Ipsam facere accusantium iusto! Quis?
-                        </p>
-                    </div>
-            </div>     
+                    lg:text-3xl sm:text-2xl text-stone-800">Dilate</h2>
+                </div>    
             </div>
         </div>
+
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('scaling') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-3xl sm:text-2xl text-stone-800">Bilinear Interpolation</h2>
+                </div>    
+            </div>
+        </div>
+
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('scaling_02') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-3xl sm:text-2xl text-stone-800">Bicubic Interpolation</h2>
+                </div>    
+            </div>
+        </div>
+
+        <div class="flex justify-center lg:w-1/4 sm:w-1/3 mb-8 mx-5">
+            <div class=" bg-white shadow hover:shadow-stone-700 hover:shadow-xl rounded-2xl">
+                <div class="px-6 pt-6">
+                    <a href="{{ url_for('saltnpepper') }}">
+                        <img src="https://images.unsplash.com/photo-1532210317995-cc56d90177d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="">
+                    </a>
+
+                    <h2 class="mt-4 mb-6 font-semibold 
+                    lg:text-3xl sm:text-2xl text-stone-800">Cleaning Salt and Pepper Noise</h2>
+                </div>    
+            </div>
+        </div>
+        
     </section>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
