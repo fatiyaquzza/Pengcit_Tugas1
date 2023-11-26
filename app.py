@@ -673,10 +673,6 @@ def calculate_chain_code():
         return render_template('chain_code.html', img=image_path, img2=chain_code)
     return render_template('chain_code.html', error_message='Please upload an image.')
 
-@app.route('/huffman_code', methods=['GET', 'POST'])
-def huffman_code():
-    return render_template('huffman_code.html')
-
 
 # A class used to implement a Binary Tree consisting of Nodes!
 class Node(object):
