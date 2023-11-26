@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import os
 import matplotlib.pyplot as plt
@@ -7,6 +7,9 @@ import cv2
 import numpy as np
 from scipy import ndimage
 from rembg import remove
+from PIL import Image
+import heapq
+from collections import defaultdict
 
 app = Flask(__name__)
 
@@ -627,6 +630,122 @@ def saltnpepper():
             return render_template('saltnpepper.html', img=img_path, img2=cleaned_img_path, filter_type=filter_type)
     
     return render_template('saltnpepper.html')
+
+class HuffmanNode:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def build_huffman_tree(data):
+    frequency = defaultdict(int)
+    for bit in data:
+        frequency[bit] += 1
+
+    heap = [HuffmanNode(bit, freq) for bit, freq in frequency.items()]
+    heapq.heapify(heap)
+
+    while len(heap) > 1:
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+
+        merged = HuffmanNode(None, left.freq + right.freq)
+        merged.left = left
+        merged.right = right
+
+        heapq.heappush(heap, merged)
+
+    return heap[0]
+
+def build_huffman_codes(node, code="", mapping=None):
+    if mapping is None:
+        mapping = {}
+
+    if node is not None:
+        if node.char is not None:
+            mapping[node.char] = code
+        build_huffman_codes(node.left, code + "0", mapping)
+        build_huffman_codes(node.right, code + "1", mapping)
+
+    return mapping
+
+def compress_image(img):
+    # Konversi gambar ke data biner
+    binary_data = ''.join(format(pixel, '08b') for pixel in img.ravel())
+
+    # Bangun pohon Huffman
+    root = build_huffman_tree(binary_data)
+
+    # Bangun tabel kode Huffman
+    codes = build_huffman_codes(root)
+
+    # Kodekan data
+    compressed_data = ''.join(codes[bit] for bit in binary_data)
+
+    return compressed_data
+
+def decompress_image(compressed_data, root):
+    current_node = root
+    decompressed_data = ""
+
+    for bit in compressed_data:
+        if bit == '0':
+            current_node = current_node.left
+        else:
+            current_node = current_node.right
+
+        if current_node.char is not None:
+            decompressed_data += current_node.char
+            current_node = root
+
+    return decompressed_data
+
+@app.route('/compress', methods=['GET', 'POST'])
+def huffman():
+    if request.method == 'POST':
+        # Simpan gambar yang diunggah
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD'], filename)
+        file.save(file_path)
+
+        # Baca gambar asli
+        img = cv2.imread(file_path)
+
+        # Kompresi Huffman
+        binary_data = compress_image(img)
+        compressed_file_path = os.path.join(app.config['UPLOAD'], 'compressed_image.bin')
+        with open(compressed_file_path, 'wb') as compressed_file:
+            compressed_file.write(binary_data.encode('utf-8'))
+
+        # Baca hasil kompresi dari file bin
+        with open(compressed_file_path, 'rb') as file:
+            compressed_data_from_file = file.read().decode('utf-8')
+
+        # Lakukan dekompresi
+        root = build_huffman_tree(compressed_data_from_file)
+        decompressed_data = decompress_image(compressed_data_from_file, root)
+
+        # Konversi bitstream ke representasi piksel gambar
+        decoded_pixels = [int(decompressed_data[i:i+8], 2) for i in range(0, len(decompressed_data), 8)]
+        decoded_image = np.array(decoded_pixels, dtype=np.uint8).reshape(img.shape)
+
+        # Simpan gambar hasil dekompresi di tempat yang sama dengan file kompresi
+        decoded_image_path = os.path.join(app.config['UPLOAD'], 'decoded_image.jpg')
+        cv2.imwrite(decoded_image_path, decoded_image)
+
+        # Render template dengan data gambar asli, hasil kompresi, dan data kompresi
+        return render_template('huffman.html', img=file_path, decoded_img=decoded_image_path)
+    
+    return render_template('huffman.html')
+
+@app.route('/decoded_image/<filename>')
+def decoded_image(filename):
+    return send_from_directory(app.config['UPLOAD'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
