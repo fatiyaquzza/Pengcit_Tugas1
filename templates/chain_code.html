@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remove Bg</title>
+    <title>Opening</title>
     <link rel="stylesheet" href="/static/css/main.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
@@ -86,14 +86,15 @@
         </h4>
       </div>
     </nav>
+
     <h2
     class="text-center lg:text-7xl md:text-6xl sm:text-5xl text-4xl font-medium py-16 mx-10 mb-12 bg-indigo-300 bg-opacity-10 text-white rounded-xl"
   >
-    Segmentasi Objek
+    Chain Code
     </h2>
 
     <form
-        action="{{ url_for('removebg') }}"
+        action="{{ url_for('calculate_chain_code') }}"
         enctype="multipart/form-data"
         method="POST"
         class=""
@@ -119,29 +120,22 @@
             />
         </div>
         </div>
-
-        <canvas id="canvas" width="200" height="200"></canvas>
-        <input type="hidden" id="roi_coordinates" name="roi_coordinates">
     </form>
 
-    <div class="flex justify-center">
-        <div class="mr-10">
-          {% if input_img %}
-          <h4 class="text-center font-medium text-2xl text-white mb-6">
-            Gambar Awal
-          </h4>
-          <img src="{{ input_img }}" class="w-[500px]" />
-          {% endif %}
-        </div>
-
-        <div class="mr-10">
-          {% if output_img %}
-          <h4 class="text-center font-medium text-2xl text-white mb-6">
-            Gambar setelah dihilangkan background
-          </h4>
-          <img src="{{ output_img }}" class="w-[500px]" />
-          {% endif %}
-        </div>
+    <div class="flex justify-center mt-10 px-10">
+      {% if img %}
+      <div class="output-container">
+          <div>
+              <h1 class="text-2xl mb-5 text-center text-white font-semibold">Original Image</h1>
+              <img src="{{ img }}" alt="Original Image">
+          </div>
+          <div class="text-justify mt-10">
+              <h1 class="text-2xl mb-5 text-center text-white font-semibold">Chain Code Result</h1>
+              <p>Chain Code: {{ img2 }}</p>
+          </div>
+      </div>
+      {% endif %}
+    </div> 
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
   

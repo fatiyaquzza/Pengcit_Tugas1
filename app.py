@@ -24,8 +24,6 @@ def allowed_file(filename):
 def home():
     return render_template('home.html')
 
-
-
 @app.route('/histogram', methods=['GET', 'POST'])
 def histogram_equ():
     if request.method == 'POST':
@@ -630,6 +628,51 @@ def saltnpepper():
             return render_template('saltnpepper.html', img=img_path, img2=cleaned_img_path, filter_type=filter_type)
     
     return render_template('saltnpepper.html')
+
+codeList = [5, 6, 7, 4, 0, 3, 2, 1]
+
+def getChainCode(dx, dy):
+    hashKey = (3 * dy + dx + 4) % len(codeList)
+    return codeList[hashKey]
+
+def generateChainCode(ListOfPoints):
+    chainCode = []
+    for i in range(len(ListOfPoints) - 1):
+        a = ListOfPoints[i]
+        b = ListOfPoints[i + 1]
+        dx = b[0] - a[0]
+        dy = b[1] - a[1]
+        chainCode.append(getChainCode(dx, dy))
+    return chainCode
+
+def calculate_chain_code_from_image(image):
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, binary_image = cv2.threshold(gray_image, 128, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    if contours:  
+        largest_contour = max(contours, key=cv2.contourArea)
+        
+        if largest_contour.size > 0:  
+            chain_code = generateChainCode([point[0] for point in largest_contour])
+            return chain_code
+        else:
+            return None  
+    else:
+        return None  
+
+@app.route('/chain_code', methods=['GET', 'POST'])
+def calculate_chain_code():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        image_path = os.path.join(app.config['UPLOAD'], filename)
+        image = cv2.imread(image_path)
+        chain_code = calculate_chain_code_from_image(image)
+        return render_template('chain_code.html', img=image_path, img2=chain_code)
+    return render_template('chain_code.html', error_message='Please upload an image.')
+
 
 # A class used to implement a Binary Tree consisting of Nodes!
 class Node(object):
