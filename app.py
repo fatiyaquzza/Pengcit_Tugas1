@@ -631,121 +631,92 @@ def saltnpepper():
     
     return render_template('saltnpepper.html')
 
-class HuffmanNode:
-    def __init__(self, char, freq):
-        self.char = char
-        self.freq = freq
-        self.left = None
-        self.right = None
+# A class used to implement a Binary Tree consisting of Nodes!
+class Node(object):
+    left = None
+    right = None
+    item = None
+    weight = 0
 
-    def __lt__(self, other):
-        return self.freq < other.freq
+    def __init__(self, symbol, weight, l=None, r=None):
+        self.symbol = symbol
+        self.weight = weight
+        self.left = l
+        self.right = r
 
-def build_huffman_tree(data):
-    frequency = defaultdict(int)
-    for bit in data:
-        frequency[bit] += 1
+    # Called when outputting/printing the node
+    def __repr__(self):
+        return '("%s", %s, %s, %s)' % (self.symbol, self.weight, self.left, self.right)
 
-    heap = [HuffmanNode(bit, freq) for bit, freq in frequency.items()]
-    heapq.heapify(heap)
+def sortByWeight(node):    
+    return (node.weight * 1000000 + ord(node.symbol[0]))  # Sort by weight and alphabetical order if same weight
 
-    while len(heap) > 1:
-        left = heapq.heappop(heap)
-        right = heapq.heappop(heap)
+# A Class used to apply the Huffman Coding algorithm to encode / compress a message
+class HuffmanEncoder:
+    def __init__(self):
+        self.symbols = {}
+        self.codes = {}
+        self.tree = []
+        self.message = ""
 
-        merged = HuffmanNode(None, left.freq + right.freq)
-        merged.left = left
-        merged.right = right
+    def frequencyAnalysis(self):
+        self.symbols = {}
+        for symbol in self.message:
+            self.symbols[symbol] = self.symbols.get(symbol, 0) + 1
 
-        heapq.heappush(heap, merged)
-
-    return heap[0]
-
-def build_huffman_codes(node, code="", mapping=None):
-    if mapping is None:
-        mapping = {}
-
-    if node is not None:
-        if node.char is not None:
-            mapping[node.char] = code
-        build_huffman_codes(node.left, code + "0", mapping)
-        build_huffman_codes(node.right, code + "1", mapping)
-
-    return mapping
-
-def compress_image(img):
-    # Konversi gambar ke data biner
-    binary_data = ''.join(format(pixel, '08b') for pixel in img.ravel())
-
-    # Bangun pohon Huffman
-    root = build_huffman_tree(binary_data)
-
-    # Bangun tabel kode Huffman
-    codes = build_huffman_codes(root)
-
-    # Kodekan data
-    compressed_data = ''.join(codes[bit] for bit in binary_data)
-
-    return compressed_data
-
-def decompress_image(compressed_data, root):
-    current_node = root
-    decompressed_data = ""
-
-    for bit in compressed_data:
-        if bit == '0':
-            current_node = current_node.left
+    def preorder_traverse(self, node, path=""):
+        if node.left == None:
+            self.codes[node.symbol] = path
         else:
-            current_node = current_node.right
+            self.preorder_traverse(node.left, path + "0")
+            self.preorder_traverse(node.right, path + "1")
 
-        if current_node.char is not None:
-            decompressed_data += current_node.char
-            current_node = root
+    def encode(self, message):
+        self.message = message
+        # Identify the list of symbols and their weights / frequency in the message
+        self.frequencyAnalysis()
 
-    return decompressed_data
+        # Convert list of symbols into a binary Tree structure
+        # Step 1: Generate list of Nodes...
+        self.tree = []
+        for symbol in self.symbols.keys():
+            self.tree.append(Node(symbol, self.symbols[symbol], None, None))
 
-@app.route('/compress', methods=['GET', 'POST'])
+        # Step 2: Sort list of nodes per weight
+        self.tree.sort(key=sortByWeight)
+
+        # Step 3: Organize all nodes into a Binary Tree.
+        while len(self.tree) > 1:  # Carry on till the tree has only one root node!
+            leftNode = self.tree.pop(0)
+            rightNode = self.tree.pop(0)
+            newNode = Node(leftNode.symbol + rightNode.symbol, leftNode.weight + rightNode.weight, leftNode, rightNode)
+            self.tree.append(newNode)
+            self.tree.sort(key=sortByWeight)
+
+        # Generate List of Huffman Code for each symbol used...
+        self.codes = {}
+        self.preorder_traverse(self.tree[0])
+
+        # Encode Message:
+        encodedMessage = ""
+        for symbol in message:
+            encodedMessage = encodedMessage + self.codes[symbol]
+
+        return encodedMessage
+
+@app.route('/huffman', methods=['GET', 'POST'])
 def huffman():
+    result = None
+
     if request.method == 'POST':
-        # Simpan gambar yang diunggah
-        file = request.files['img']
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD'], filename)
-        file.save(file_path)
+        message = request.form['message']
+        encoder = HuffmanEncoder()
+        compressedMessage = encoder.encode(message)
+        result = {"message": message, "compressedMessage": compressedMessage}
 
-        # Baca gambar asli
-        img = cv2.imread(file_path)
+        return render_template('huffman.html', result=result)
 
-        # Kompresi Huffman
-        binary_data = compress_image(img)
-        compressed_file_path = os.path.join(app.config['UPLOAD'], 'compressed_image.bin')
-        with open(compressed_file_path, 'wb') as compressed_file:
-            compressed_file.write(binary_data.encode('utf-8'))
-
-        # Baca hasil kompresi dari file bin
-        with open(compressed_file_path, 'rb') as file:
-            compressed_data_from_file = file.read().decode('utf-8')
-
-        # Lakukan dekompresi
-        root = build_huffman_tree(compressed_data_from_file)
-        decompressed_data = decompress_image(compressed_data_from_file, root)
-
-        # Konversi bitstream ke representasi piksel gambar
-        decoded_pixels = [int(decompressed_data[i:i+8], 2) for i in range(0, len(decompressed_data), 8)]
-        decoded_image = np.array(decoded_pixels, dtype=np.uint8).reshape(img.shape)
-
-        # Simpan gambar hasil dekompresi di tempat yang sama dengan file kompresi
-        decoded_image_path = os.path.join(app.config['UPLOAD'], 'decoded_image.jpg')
-        cv2.imwrite(decoded_image_path, decoded_image)
-
-        # Render template dengan data gambar asli, hasil kompresi, dan data kompresi
-        return render_template('huffman.html', img=file_path, decoded_img=decoded_image_path)
-    
     return render_template('huffman.html')
-
-@app.route('/decoded_image/<filename>')
-def decoded_image(filename):
-    return send_from_directory(app.config['UPLOAD'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
