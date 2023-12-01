@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import os
 import matplotlib.pyplot as plt
@@ -7,6 +7,9 @@ import cv2
 import numpy as np
 from scipy import ndimage
 from rembg import remove
+from PIL import Image
+import heapq
+from collections import defaultdict
 
 app = Flask(__name__)
 
@@ -20,8 +23,6 @@ def allowed_file(filename):
 @app.route('/')
 def home():
     return render_template('home.html')
-
-
 
 @app.route('/histogram', methods=['GET', 'POST'])
 def histogram_equ():
@@ -627,6 +628,138 @@ def saltnpepper():
             return render_template('saltnpepper.html', img=img_path, img2=cleaned_img_path, filter_type=filter_type)
     
     return render_template('saltnpepper.html')
+
+codeList = [5, 6, 7, 4, 0, 3, 2, 1]
+
+def getChainCode(dx, dy):
+    hashKey = (3 * dy + dx + 4) % len(codeList)
+    return codeList[hashKey]
+
+def generateChainCode(ListOfPoints):
+    chainCode = []
+    for i in range(len(ListOfPoints) - 1):
+        a = ListOfPoints[i]
+        b = ListOfPoints[i + 1]
+        dx = b[0] - a[0]
+        dy = b[1] - a[1]
+        chainCode.append(getChainCode(dx, dy))
+    return chainCode
+
+def calculate_chain_code_from_image(image):
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, binary_image = cv2.threshold(gray_image, 128, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    if contours:  
+        largest_contour = max(contours, key=cv2.contourArea)
+        
+        if largest_contour.size > 0:  
+            chain_code = generateChainCode([point[0] for point in largest_contour])
+            return chain_code
+        else:
+            return None  
+    else:
+        return None  
+
+@app.route('/chain_code', methods=['GET', 'POST'])
+def calculate_chain_code():
+    if request.method == 'POST':
+        file = request.files['img']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD'], filename))
+        image_path = os.path.join(app.config['UPLOAD'], filename)
+        image = cv2.imread(image_path)
+        chain_code = calculate_chain_code_from_image(image)
+        return render_template('chain_code.html', img=image_path, img2=chain_code)
+    return render_template('chain_code.html', error_message='Please upload an image.')
+
+
+# A class used to implement a Binary Tree consisting of Nodes!
+class Node(object):
+    left = None
+    right = None
+    item = None
+    weight = 0
+
+    def __init__(self, symbol, weight, l=None, r=None):
+        self.symbol = symbol
+        self.weight = weight
+        self.left = l
+        self.right = r
+
+    # Called when outputting/printing the node
+    def __repr__(self):
+        return '("%s", %s, %s, %s)' % (self.symbol, self.weight, self.left, self.right)
+
+def sortByWeight(node):    
+    return (node.weight * 1000000 + ord(node.symbol[0]))  # Sort by weight and alphabetical order if same weight
+
+# A Class used to apply the Huffman Coding algorithm to encode / compress a message
+class HuffmanEncoder:
+    def __init__(self):
+        self.symbols = {}
+        self.codes = {}
+        self.tree = []
+        self.message = ""
+
+    def frequencyAnalysis(self):
+        self.symbols = {}
+        for symbol in self.message:
+            self.symbols[symbol] = self.symbols.get(symbol, 0) + 1
+
+    def preorder_traverse(self, node, path=""):
+        if node.left == None:
+            self.codes[node.symbol] = path
+        else:
+            self.preorder_traverse(node.left, path + "0")
+            self.preorder_traverse(node.right, path + "1")
+
+    def encode(self, message):
+        self.message = message
+        # Identify the list of symbols and their weights / frequency in the message
+        self.frequencyAnalysis()
+
+        # Convert list of symbols into a binary Tree structure
+        # Step 1: Generate list of Nodes...
+        self.tree = []
+        for symbol in self.symbols.keys():
+            self.tree.append(Node(symbol, self.symbols[symbol], None, None))
+
+        # Step 2: Sort list of nodes per weight
+        self.tree.sort(key=sortByWeight)
+
+        # Step 3: Organize all nodes into a Binary Tree.
+        while len(self.tree) > 1:  # Carry on till the tree has only one root node!
+            leftNode = self.tree.pop(0)
+            rightNode = self.tree.pop(0)
+            newNode = Node(leftNode.symbol + rightNode.symbol, leftNode.weight + rightNode.weight, leftNode, rightNode)
+            self.tree.append(newNode)
+            self.tree.sort(key=sortByWeight)
+
+        # Generate List of Huffman Code for each symbol used...
+        self.codes = {}
+        self.preorder_traverse(self.tree[0])
+
+        # Encode Message:
+        encodedMessage = ""
+        for symbol in message:
+            encodedMessage = encodedMessage + self.codes[symbol]
+
+        return encodedMessage
+
+@app.route('/huffman', methods=['GET', 'POST'])
+def huffman():
+    result = None
+
+    if request.method == 'POST':
+        message = request.form['message']
+        encoder = HuffmanEncoder()
+        compressedMessage = encoder.encode(message)
+        result = {"message": message, "compressedMessage": compressedMessage}
+
+        return render_template('huffman.html', result=result)
+
+    return render_template('huffman.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
